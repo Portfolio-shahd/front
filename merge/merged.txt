@@ -1,44 +1,177 @@
 // File: c:\Users\ashre\Downloads\demo (1)\front\Portfolio\src\App.tsx
-import { ChakraProvider, Box } from "@chakra-ui/react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Box } from "@chakra-ui/react";
 import Navbar from "./components/ui/navbar";
 import LandingPage from "./sections/LandingPage/LandingPage";
 import AboutMe from "./sections/About/About";
 import Skills from "./sections/Skills/Skills";
 import Projects from "./sections/Projects/Projects";
 import Contact from "./sections/Contact/Contact";
+import Footer from "./components/ui/footer";
+import ContactsAdminPage from "./pages/ContactsAdmin";
+
+// Main Portfolio Component
+const Portfolio = () => (
+  <Box w="100%" maxW="100vw" overflowX="hidden">
+    {/* Navbar en haut */}
+    <Navbar />
+    {/* Landing Page Section */}
+    <Box id="home">
+      <LandingPage />
+    </Box>
+    {/* About Me Section */}
+    <Box id="aboutme">
+      <AboutMe />
+    </Box>
+    {/* Skills Section */}
+    <Box id="skills">
+      <Skills />
+    </Box>
+    {/* Projects Section */}
+    <Box id="myprojects">
+      <Projects />
+    </Box>
+    {/* Contact Section */}
+    <Box id="contact">
+      <Contact />
+    </Box>
+    {/* Footer Section */}
+    <Footer />
+  </Box>
+);
 
 function App() {
   return (
-    <Box w="100%" maxW="100vw" overflowX="hidden">
-      {/* Navbar en haut */}
-      <Navbar />
-      {/* Landing Page Section */}
-      <Box id="home">
-        <LandingPage />
-      </Box>
-      {/* About Me Section */}
-      <Box id="aboutme">
-        <AboutMe />
-      </Box>
-      {/* Skills Section */}
-      <Box id="skills">
-        <Skills />
-      </Box>
-      {/* Projects Section */}
-      <Box id="myprojects">
-        <Projects />
-      </Box>
-      {/* Contact Section */}
-      <Box id="contact">
-        <Contact />
-      </Box>
-    </Box>
+    <Router basename="/Portfolio">
+      <Routes>
+        <Route path="/" element={<Portfolio />} />
+        <Route path="/seeshahdoudascontact" element={<ContactsAdminPage />} />
+      </Routes>
+    </Router>
   );
 }
 
 export default App;
 
+// File: c:\Users\ashre\Downloads\demo (1)\front\Portfolio\src\components\ui\footer.tsx
+import { Box, Container, Text, VStack, HStack, Link } from '@chakra-ui/react';
+import { CIcon } from '@coreui/icons-react';
+import { cibGithub, cibLinkedinIn, cibGmail, cibWhatsapp } from '@coreui/icons';
+
+const Footer = () => {
+  return (
+    <Box
+      bg="#D76C82"
+      color="#EBE8DB"
+      py={{ base: "32px", md: "48px" }}
+      position="relative"
+      borderTop="1px solid #D76C82"
+    >
+      <Container maxW={{ base: "90%", md: "1280px" }}>
+        <VStack gap={{ base: "24px", md: "32px" }} align="center">
+          <Text
+            fontSize={{ base: "16px", md: "18px" }}
+            fontWeight="medium"
+            textAlign="center"
+          >
+            &copy; {new Date().getFullYear()} Shahd Najjar. All rights reserved.
+          </Text>
+          
+          <HStack gap={{ base: "16px", md: "24px" }}>
+            <Link
+              href="https://github.com/shahdnajjar"
+              target="_blank"
+              rel="noopener noreferrer"
+              _hover={{ textDecoration: "none", transform: "scale(1.1)" }}
+              transition="all 0.3s"
+            >
+              <CIcon
+                icon={cibGithub}
+                size="lg"
+                style={{
+                  fill: "#3D0301",
+                  transition: "all 0.3s",
+                  width: "28px",
+                  height: "28px",
+                }}
+              />
+            </Link>
+            
+            <Link
+              href="https://www.linkedin.com/in/shahd-najjar-5228a620a"
+              target="_blank"
+              rel="noopener noreferrer"
+              _hover={{ textDecoration: "none", transform: "scale(1.1)" }}
+              transition="all 0.3s"
+            >
+              <CIcon
+                icon={cibLinkedinIn}
+                size="lg"
+                style={{
+                  fill: "#3D0301",
+                  transition: "all 0.3s",
+                  width: "28px",
+                  height: "28px",
+                }}
+              />
+            </Link>
+            
+            <Link
+              href="mailto:shahdnajjar50@gmail.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              _hover={{ textDecoration: "none", transform: "scale(1.1)" }}
+              transition="all 0.3s"
+            >
+              <CIcon
+                icon={cibGmail}
+                size="lg"
+                style={{
+                  fill: "#3D0301",
+                  transition: "all 0.3s",
+                  width: "28px",
+                  height: "28px",
+                }}
+              />
+            </Link>
+            
+            <Link
+              href="https://wa.me/+21694243333"
+              target="_blank"
+              rel="noopener noreferrer"
+              _hover={{ textDecoration: "none", transform: "scale(1.1)" }}
+              transition="all 0.3s"
+            >
+              <CIcon
+                icon={cibWhatsapp}
+                size="lg"
+                style={{
+                  fill: "#3D0301",
+                  transition: "all 0.3s",
+                  width: "28px",
+                  height: "28px",
+                }}
+              />
+            </Link>
+          </HStack>
+          
+          <Text
+            fontSize={{ base: "14px", md: "16px" }}
+            opacity={0.8}
+            textAlign="center"
+          >
+            Built with passion by Shahd Najjar
+          </Text>
+        </VStack>
+      </Container>
+    </Box>
+  );
+};
+
+export default Footer;
+
 // File: c:\Users\ashre\Downloads\demo (1)\front\Portfolio\src\components\ui\navbar.tsx
+// File: components/ui/navbar.tsx
 import React, { useRef } from "react";
 import {
   Box,
@@ -47,38 +180,45 @@ import {
   Link,
   IconButton,
   Button,
-  useDisclosure,
   VStack,
 } from "@chakra-ui/react";
 import { Menu, X } from "lucide-react";
 
-const Links = ["Home", "About Me", "Skills", "My Projects", "Contact"];
+const Links = ["Home", "About Me", "Skills", "My Projects"];
 
 type NavLinkProps = {
   children: string;
   onClick?: (e: React.MouseEvent) => void;
+  isMobile?: boolean;
 };
 
-const NavLink = ({ children, onClick }: NavLinkProps) => {
+const NavLink = ({ children, onClick, isMobile = false }: NavLinkProps) => {
   const id = children.toLowerCase().replace(/\s+/g, "");
+  const textColor = "#3D0301";
+  const hoverColor = "#D76C82";
+  const hoverBg = isMobile ? "rgba(235, 232, 219, 0.1)" : "transparent";
+  const hoverTransform = isMobile ? "translateX(8px)" : "scale(1.03)";
+  
   return (
     <Link
-      px={{ base: 1, md: 2 }}
-      py={1}
-      borderRadius="md"
+      px={isMobile ? 4 : { base: 1, md: 2 }}
+      py={isMobile ? 3 : 1}
+      borderRadius={isMobile ? "xl" : "md"}
       href={`#${id}`}
       onClick={onClick}
-      fontWeight="medium"
-      fontSize={{ base: "md", md: "lg" }}
-      color="#3D0301"
+      fontWeight={isMobile ? "semibold" : "medium"}
+      fontSize={isMobile ? "lg" : { base: "md", md: "lg" }}
+      color={textColor}
       position="relative"
       transition="all 0.18s ease"
+      width={isMobile ? "full" : "auto"}
       _hover={{
         textDecoration: "none",
-        color: "#D76C82",
-        transform: "scale(1.03)",
+        color: hoverColor,
+        transform: hoverTransform,
+        bg: hoverBg,
       }}
-      _after={{
+      _after={!isMobile ? {
         content: '""',
         position: "absolute",
         width: "0%",
@@ -87,7 +227,7 @@ const NavLink = ({ children, onClick }: NavLinkProps) => {
         left: 0,
         background: "#D76C82",
         transition: "width 0.28s ease",
-      }}
+      } : {}}
     >
       {children}
     </Link>
@@ -95,7 +235,7 @@ const NavLink = ({ children, onClick }: NavLinkProps) => {
 };
 
 export default function Navbar() {
-  const { isOpen, onToggle } = useDisclosure();
+  const [isOpen, setIsOpen] = React.useState(false);
   const navbarRef = useRef<HTMLDivElement | null>(null);
 
   const handleNavClick =
@@ -110,142 +250,562 @@ export default function Navbar() {
         target.getBoundingClientRect().top + window.pageYOffset - headerHeight - extraSpacing;
       window.scrollTo({ top: Math.max(0, targetY), behavior: "smooth" });
       if (isOpen) {
-        onToggle();
+        setIsOpen(false);
       }
     };
 
   return (
-    <Box
-      position={{ base: "fixed", md: "absolute" }}
-      top={0}
-      left={0}
-      right={0}
-      zIndex={20}
-      px={{ base: 4, md: 8 }}
-      py={{ base: 4, md: 6 }}
-      bg={{ base: "#EBE8DB", md: "transparent" }}
-    >
+    <>
+      {/* Backdrop Overlay */}
       <Box
-        ref={navbarRef}
-        background="#EBE8DB"
-        borderRadius="full"
-        px={{ base: 4, md: 8 }}
-        py={{ base: 3, md: 4 }}
-        border="1px solid #bb9fa4ff"
-        boxShadow="0 8px 32px rgba(61, 3, 1, 0.1)"
-        position="relative"
+        position="fixed"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        bg="rgba(61, 3, 1, 0.5)"
+        zIndex={25}
+        opacity={isOpen ? 1 : 0}
+        visibility={isOpen ? "visible" : "hidden"}
+        transition="all 0.3s ease"
+        display={{ base: "block", md: "none" }}
+        onClick={() => setIsOpen(false)}
+        backdropFilter="blur(4px)"
+      />
+
+      {/* Mobile Sidebar */}
+      <Box
+        position="fixed"
+        top={0}
+        left={0}
+        height="100vh"
+        width="66.666667%"
+        bg="#EBE8DB"
+        zIndex={30}
+        transform={isOpen ? "translateX(0)" : "translateX(-100%)"}
+        transition="transform 0.3s ease"
+        display={{ base: "block", md: "none" }}
+        boxShadow="4px 0 20px rgba(0, 0, 0, 0.15)"
       >
-        <Flex alignItems="center" justifyContent="space-between">
-          <Flex alignItems="center" fontWeight="bold" fontSize={{ base: "xl", md: "2xl" }}>
-            <Box
-              color="#B03052"
-              fontSize={{ base: "2xl", md: "3xl" }}
-              fontWeight="extrabold"
-            >
-              S
-            </Box>
-          </Flex>
-
-          <HStack gap={{ base: 4, md: 8 }} display={{ base: "none", md: "flex" }} alignItems="center">
-            {Links.map((link) => {
-              const id = link.toLowerCase().replace(/\s+/g, "");
-              return (
-                <NavLink key={link} onClick={handleNavClick(id)}>
-                  {link}
-                </NavLink>
-              );
-            })}
-          </HStack>
-
-          <Button
-            background="#D76C82"
+        <VStack
+          alignItems="start"
+          gap={6}
+          px={6}
+          pt={20}
+          height="full"
+          position="relative"
+        >
+          {/* Close Button */}
+          <IconButton
+            aria-label="Close Menu"
+            position="absolute"
+            top={4}
+            right={4}
+            bg="rgba(235, 232, 219, 0.2)"
             color="#EBE8DB"
-            px={{ base: 4, md: 6 }}
-            py={{ base: 1, md: 2 }}
+            borderRadius="xl"
+            _hover={{ bg: "rgba(235, 232, 219, 0.3)" }}
+            onClick={() => setIsOpen(false)}
+            size="sm"
+          >
+            <X size={18} />
+          </IconButton>
+
+          {/* Logo */}
+          <Box
+            color="#D76C82"
+            fontSize="3xl"
+            fontWeight="extrabold"
+            mb={4}
+          >
+            Shahd
+          </Box>
+
+          {/* Navigation Links */}
+          {Links.map((link) => {
+            const id = link.toLowerCase().replace(/\s+/g, "");
+            return (
+              <NavLink key={link} onClick={handleNavClick(id)} isMobile={true}>
+                {link}
+              </NavLink>
+            );
+          })}
+
+          {/* Contact Button */}
+          <Button
+            width="full"
+            maxW="200px"
+            background="#EBE8DB"
+            color="#3D0301"
             borderRadius="full"
-            fontWeight="semibold"
-            fontSize={{ base: "xs", md: "sm" }}
+            fontWeight="bold"
+            fontSize="lg"
+            onClick={handleNavClick("contact")}
+            py={3}
+            mt={4}
             _hover={{
               transform: "translateY(-2px)",
-              boxShadow: "0 12px 25px rgba(215, 108, 130, 0.4)",
-              background: "#C95A78"
+              boxShadow: "0 8px 20px rgba(235, 232, 219, 0.3)",
             }}
             transition="all 0.3s"
-            display={{ base: "none", md: "inline-flex" }}
-            onClick={handleNavClick("contact")}
           >
             Contact
           </Button>
+        </VStack>
+      </Box>
 
-          <IconButton
-            aria-label="Menu"
-            background="#EBE8DB"
-            color="#3D0301"
-            borderRadius="xl"
-            border="1px solid #89676eff"
-            _hover={{ background: "#E5E2D5" }}
-            display={{ base: "flex", md: "none" }}
-            onClick={onToggle}
-            size={{ base: "sm", md: "md" }}
-          >
-            {isOpen ? <X size={{ base: 16, md: 18 }} /> : <Menu size={{ base: 16, md: 18 }} />}
-          </IconButton>
-        </Flex>
-
+      {/* Main Navbar */}
+      <Box
+        position={{ base: "fixed", md: "absolute" }}
+        top={0}
+        left={0}
+        right={0}
+        zIndex={20}
+        px={{ base: 4, md: 8 }}
+        py={{ base: 4, md: 6 }}
+        bg={{ base: "#EBE8DB", md: "transparent" }}
+      >
         <Box
-          display={{ md: "none" }}
-          maxHeight={isOpen ? "360px" : "0px"}
-          overflow="hidden"
-          transition="max-height 220ms ease"
-          mt={{ base: 2, md: 4 }}
+          ref={navbarRef}
+          background="#EBE8DB"
+          borderRadius="full"
+          px={{ base: 4, md: 8 }}
+          py={{ base: 3, md: 4 }}
+          border="1px solid #bb9fa4ff"
+          boxShadow="0 8px 32px rgba(61, 3, 1, 0.1)"
+          position="relative"
         >
-          <VStack alignItems="start" gap={4} px={4} pb={4}>
-            {Links.map((link) => {
-              const id = link.toLowerCase().replace(/\s+/g, "");
-              return (
-                <NavLink key={link} onClick={handleNavClick(id)}>
-                  {link}
-                </NavLink>
-              );
-            })}
+          <Flex alignItems="center" justifyContent="space-between">
+            <Flex alignItems="center" fontWeight="bold" fontSize={{ base: "xl", md: "2xl" }}>
+              <Box
+                color="#B03052"
+                fontSize={{ base: "2xl", md: "3xl" }}
+                fontWeight="extrabold"
+              >
+                S
+              </Box>
+            </Flex>
+
+            <HStack gap={{ base: 4, md: 8 }} display={{ base: "none", md: "flex" }} alignItems="center">
+              {Links.map((link) => {
+                const id = link.toLowerCase().replace(/\s+/g, "");
+                return (
+                  <NavLink key={link} onClick={handleNavClick(id)}>
+                    {link}
+                  </NavLink>
+                );
+              })}
+            </HStack>
+
             <Button
-              width="full"
-              maxW="200px"
               background="#D76C82"
-              color="#EBE8DB"
+              color="#3D0301"
+              px={{ base: 4, md: 6 }}
+              py={{ base: 1, md: 2 }}
               borderRadius="full"
               fontWeight="semibold"
-              fontSize="sm"
+              fontSize={{ base: "xs", md: "sm" }}
+              _hover={{
+                transform: "translateY(-2px)",
+                boxShadow: "0 12px 25px rgba(215, 108, 130, 0.4)",
+                background: "#C95A78"
+              }}
+              transition="all 0.3s"
+              display={{ base: "none", md: "inline-flex" }}
               onClick={handleNavClick("contact")}
-              py={2}
             >
               Contact
             </Button>
-          </VStack>
+
+            <IconButton
+              aria-label="Menu"
+              background="#EBE8DB"
+              color="#3D0301"
+              borderRadius="xl"
+              border="1px solid #89676eff"
+              _hover={{ background: "#E5E2D5" }}
+              display={{ base: "flex", md: "none" }}
+              onClick={() => setIsOpen(!isOpen)}
+              size={{ base: "sm", md: "md" }}
+            >
+              <Menu size={18} />
+            </IconButton>
+          </Flex>
         </Box>
       </Box>
-    </Box>
+    </>
   );
 }
 
 // File: c:\Users\ashre\Downloads\demo (1)\front\Portfolio\src\main.tsx
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ChakraProvider, createSystem, defaultConfig } from '@chakra-ui/react';
+import { ChakraProvider, defaultSystem } from '@chakra-ui/react';
 import App from './App.tsx';
-
-// Create the system with default config
-const system = createSystem(defaultConfig);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ChakraProvider value={system}>
+    <ChakraProvider value={defaultSystem}>
       <App />
     </ChakraProvider>
   </StrictMode>
 );
 
+// File: c:\Users\ashre\Downloads\demo (1)\front\Portfolio\src\pages\ContactsAdmin.tsx
+import { useState, useEffect } from 'react';
+import {
+  Box,
+  Container,
+  Heading,
+  VStack,
+  HStack,
+  Text,
+  Badge,
+  Button,
+  Input,
+  Grid,
+  GridItem,
+  Spinner,
+  Alert,
+  Card,
+} from '@chakra-ui/react';
+import { Search, Mail, Calendar, User } from 'lucide-react';
+
+interface Contact {
+  id: number;
+  name: string;
+  email: string;
+  message: string;
+  createdAt: string;
+}
+
+const ContactsAdminPage = () => {
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredContacts, setFilteredContacts] = useState<Contact[]>([]);
+
+  useEffect(() => {
+    fetchContacts();
+  }, []);
+
+  useEffect(() => {
+    const filtered = contacts.filter(contact =>
+      contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      contact.message.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredContacts(filtered);
+  }, [contacts, searchTerm]);
+
+  const fetchContacts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:8080/api/contacts');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch contacts');
+      }
+      
+      const data = await response.json();
+      setContacts(data);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  return (
+    <Box
+      minH="100vh"
+      bg="#EBE8DB"
+      position="relative"
+      py={{ base: 10, md: 20 }}
+      overflow="hidden"
+    >
+      {/* Background decorative elements */}
+      <Box position="absolute" inset={0}>
+        <Box
+          position="absolute"
+          top={{ base: "40px", md: "80px" }}
+          left={{ base: "20px", md: "40px" }}
+          w={{ base: "80px", md: "128px" }}
+          h={{ base: "80px", md: "128px" }}
+          bg="#B03052"
+          opacity={0.1}
+          borderRadius="full"
+          filter="blur(48px)"
+        />
+        <Box
+          position="absolute"
+          bottom={{ base: "40px", md: "80px" }}
+          right={{ base: "20px", md: "80px" }}
+          w={{ base: "100px", md: "160px" }}
+          h={{ base: "100px", md: "160px" }}
+          bg="#D76C82"
+          opacity={0.1}
+          borderRadius="full"
+          filter="blur(48px)"
+        />
+      </Box>
+
+      <Container maxW={{ base: "95%", md: "7xl" }} position="relative" zIndex={10}>
+        {/* Header Section */}
+        <VStack gap={{ base: 4, md: 6 }} mb={{ base: 8, md: 16 }} textAlign="center">
+          <Heading
+            color="#3D0301"
+            fontSize={{ base: '2xl', sm: '3xl', md: '4xl', lg: '6xl' }}
+            fontWeight="bold"
+          >
+            Contact <Text as="span" color="#B03052">Messages</Text>
+          </Heading>
+          <Box w="80px" h="4px" bg="#D76C82" borderRadius="full" />
+        </VStack>
+
+        {/* Search and Stats */}
+        <VStack gap={{ base: 4, md: 6 }} mb={{ base: 6, md: 8 }}>
+          <HStack
+            bg="#EBE8DB"
+            borderRadius="full"
+            border="2px solid #D76C82"
+            px={{ base: 4, md: 6 }}
+            py={{ base: 2, md: 3 }}
+            maxW={{ base: "100%", md: "500px" }}
+            w="full"
+          >
+            <Search size={20} color="#D76C82" />
+            <Input
+              placeholder="Search contacts..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              border="none"
+              bg="transparent"
+              color="#3D0301"
+              _focus={{ boxShadow: "none" }}
+              _placeholder={{ color: "#3D0301", opacity: 0.6 }}
+            />
+          </HStack>
+
+          <HStack gap={{ base: 4, md: 8 }} flexWrap="wrap" justify="center">
+            <Badge
+              bg="#D76C82"
+              color="#EBE8DB"
+              px={{ base: 3, md: 4 }}
+              py={{ base: 1, md: 2 }}
+              borderRadius="full"
+              fontSize={{ base: "sm", md: "md" }}
+            >
+              Total: {contacts.length}
+            </Badge>
+            <Badge
+              bg="#B03052"
+              color="#EBE8DB"
+              px={{ base: 3, md: 4 }}
+              py={{ base: 1, md: 2 }}
+              borderRadius="full"
+              fontSize={{ base: "sm", md: "md" }}
+            >
+              Filtered: {filteredContacts.length}
+            </Badge>
+          </HStack>
+
+          <Button
+            bg="#D76C82"
+            color="#EBE8DB"
+            borderRadius="full"
+            px={{ base: 4, md: 6 }}
+            py={{ base: 2, md: 3 }}
+            _hover={{ bg: "#C95A78", transform: "translateY(-2px)" }}
+            transition="all 0.3s"
+            onClick={fetchContacts}
+            disabled={loading}
+          >
+            {loading ? <Spinner size="sm" /> : "Refresh"}
+          </Button>
+        </VStack>
+
+        {/* Error Alert */}
+        {error && (
+          <Box mb={{ base: 6, md: 8 }}>
+            <Alert.Root status="error">
+              <Alert.Indicator />
+              <Box>
+                <Alert.Title>Error Loading Contacts</Alert.Title>
+                <Alert.Description>{error}</Alert.Description>
+              </Box>
+            </Alert.Root>
+          </Box>
+        )}
+
+        {/* Loading State */}
+        {loading ? (
+          <VStack gap={4} py={10}>
+            <Spinner size="xl" color="#D76C82" />
+            <Text color="#3D0301" fontSize="lg">Loading contacts...</Text>
+          </VStack>
+        ) : (
+          /* Contacts Grid */
+          <Grid
+            templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }}
+            gap={{ base: 4, md: 6 }}
+          >
+            {filteredContacts.length === 0 ? (
+              <GridItem colSpan={{ base: 1, md: 2, lg: 3 }}>
+                <Box
+                  bg="#FFF2EF"
+                  borderRadius="2xl"
+                  border="2px solid #D76C82"
+                  p={{ base: 6, md: 8 }}
+                  textAlign="center"
+                >
+                  <Text color="#3D0301" fontSize="lg" fontWeight="medium">
+                    {contacts.length === 0 ? "No contacts found" : "No contacts match your search"}
+                  </Text>
+                </Box>
+              </GridItem>
+            ) : (
+              filteredContacts.map((contact) => (
+                <GridItem key={contact.id}>
+                  <Card.Root
+                    bg="#FFF2EF"
+                    borderRadius="2xl"
+                    border="2px solid rgba(215, 108, 130, 0.3)"
+                    transition="all 0.3s"
+                    _hover={{
+                      transform: 'translateY(-8px)',
+                      borderColor: '#D76C82',
+                      boxShadow: '0 12px 40px rgba(215, 108, 130, 0.2)',
+                    }}
+                    h="full"
+                  >
+                    <Card.Body p={{ base: 4, md: 6 }}>
+                      <VStack align="start" gap={{ base: 3, md: 4 }} h="full">
+                        {/* Header with name and date */}
+                        <VStack align="start" gap={2} w="full">
+                          <HStack justify="space-between" w="full" align="start">
+                            <HStack>
+                              <User size={16} color="#D76C82" />
+                              <Text
+                                color="#3D0301"
+                                fontSize={{ base: "md", md: "lg" }}
+                                fontWeight="bold"
+                                textOverflow="ellipsis"
+                                overflow="hidden"
+                                whiteSpace="nowrap"
+                              >
+                                {contact.name}
+                              </Text>
+                            </HStack>
+                            <Badge
+                              bg="#D76C82"
+                              color="#EBE8DB"
+                              fontSize="xs"
+                              px={2}
+                              py={1}
+                              borderRadius="full"
+                            >
+                              #{contact.id}
+                            </Badge>
+                          </HStack>
+
+                          <HStack>
+                            <Mail size={14} color="#B03052" />
+                            <Text
+                              color="#B03052"
+                              fontSize={{ base: "xs", md: "sm" }}
+                              textOverflow="ellipsis"
+                              overflow="hidden"
+                              whiteSpace="nowrap"
+                            >
+                              {contact.email}
+                            </Text>
+                          </HStack>
+
+                          <HStack>
+                            <Calendar size={14} color="#3D0301" />
+                            <Text
+                              color="#3D0301"
+                              fontSize={{ base: "xs", md: "sm" }}
+                              opacity={0.7}
+                            >
+                              {formatDate(contact.createdAt)}
+                            </Text>
+                          </HStack>
+                        </VStack>
+
+                        {/* Message content */}
+                        <Box
+                          flex={1}
+                          bg="rgba(235, 232, 219, 0.5)"
+                          borderRadius="xl"
+                          p={{ base: 3, md: 4 }}
+                          border="1px solid rgba(215, 108, 130, 0.2)"
+                        >
+                          <Text
+                            color="#3D0301"
+                            fontSize={{ base: "sm", md: "sm" }}
+                            lineHeight="relaxed"
+                            overflow="hidden"
+                            display="-webkit-box"
+                            css={{
+                              WebkitLineClamp: 5,
+                              WebkitBoxOrient: 'vertical',
+                            }}
+                          >
+                            {contact.message}
+                          </Text>
+                        </Box>
+
+                        {/* Action button */}
+                        <Box w="full">
+                          <Button
+                            bg="#D76C82"
+                            color="#EBE8DB"
+                            size="sm"
+                            borderRadius="full"
+                            px={4}
+                            _hover={{ bg: "#C95A78" }}
+                            transition="all 0.3s"
+                            w="full"
+                            onClick={() => window.open(`mailto:${contact.email}`, '_self')}
+                          >
+                            Reply via Email
+                          </Button>
+                        </Box>
+                      </VStack>
+                    </Card.Body>
+                  </Card.Root>
+                </GridItem>
+              ))
+            )}
+          </Grid>
+        )}
+      </Container>
+    </Box>
+  );
+};
+
+export default ContactsAdminPage;
+
 // File: c:\Users\ashre\Downloads\demo (1)\front\Portfolio\src\sections\About\About.tsx
+// File: sections/About/About.tsx
 import {
   Box,
   Container,
@@ -384,7 +944,10 @@ const AboutMe = () => {
 
 export default AboutMe;
 
+
 // File: c:\Users\ashre\Downloads\demo (1)\front\Portfolio\src\sections\Contact\Contact.tsx
+// File: sections/Contact/Contact.tsx
+import { useState } from 'react';
 import {
   Box,
   Container,
@@ -394,9 +957,85 @@ import {
   Textarea,
   Button,
   Text,
+  Field,
+  Alert,
 } from '@chakra-ui/react';
 
+interface ContactForm {
+  name: string;
+  email: string;
+  message: string;
+}
+
+interface ApiResponse {
+  success: boolean;
+  message: string;
+  errors?: { [key: string]: string };
+}
+
 const Contact = () => {
+  const [formData, setFormData] = useState<ContactForm>({
+    name: '',
+    email: '',
+    message: ''
+  });
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [response, setResponse] = useState<ApiResponse | null>(null);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setResponse(null);
+    setErrors({});
+
+    try {
+      const response = await fetch('http://localhost:8080/api/contacts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data: ApiResponse = await response.json();
+      
+      if (data.success) {
+        setResponse(data);
+        setFormData({ name: '', email: '', message: '' }); // Clear form
+      } else {
+        setResponse(data);
+        if (data.errors) {
+          setErrors(data.errors);
+        }
+      }
+    } catch (error) {
+      setResponse({
+        success: false,
+        message: 'Network error. Please check your connection and try again.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <Box
       minH={{ base: "auto", md: "100vh" }}
@@ -442,6 +1081,19 @@ const Contact = () => {
           <Box w="80px" h="4px" bg="#D76C82" borderRadius="full" />
         </VStack>
 
+        {/* Response Alert */}
+        {response && (
+          <Box mb={6} maxW={{ base: "100%", md: "600px" }} mx="auto">
+            <Alert.Root status={response.success ? "success" : "error"}>
+              <Alert.Indicator />
+              <Alert.Title>
+                {response.success ? "Message Sent!" : "Error"}
+              </Alert.Title>
+              <Alert.Description>{response.message}</Alert.Description>
+            </Alert.Root>
+          </Box>
+        )}
+
         <Box
           bg="#EBE8DB"
           borderRadius="3xl"
@@ -454,71 +1106,92 @@ const Contact = () => {
           transition="all 0.3s"
           _hover={{ borderColor: '#c4a6aeff' }}
         >
-          <VStack gap={{ base: 4, md: 6 }} align="start">
-            <Box w="full">
-              <Text color="#3D0301" fontWeight="semibold" mb={2}>
-                Name
-              </Text>
-              <Input
-                type="text"
-                placeholder="Your Name"
-                bg="#FFF2EF"
-                border="1px solid #d4b3baff"
-                borderRadius="md"
-                color="#3D0301"
-                _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
-                size={{ base: "md", md: "lg" }}
-              />
-            </Box>
+          <form onSubmit={handleSubmit}>
+            <VStack gap={{ base: 4, md: 6 }} align="start">
+              <Field.Root invalid={!!errors.name}>
+                <Field.Label>Name</Field.Label>
+                <Input
+                  name="name"
+                  type="text"
+                  placeholder="Your Name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  bg="#FFF2EF"
+                  border="1px solid #d4b3baff"
+                  borderRadius="md"
+                  color="#3D0301"
+                  _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
+                  size={{ base: "md", md: "lg" }}
+                  required
+                />
+                {errors.name && (
+                  <Field.ErrorText>{errors.name}</Field.ErrorText>
+                )}
+              </Field.Root>
 
-            <Box w="full">
-              <Text color="#3D0301" fontWeight="semibold" mb={2}>
-                Email
-              </Text>
-              <Input
-                type="email"
-                placeholder="Your Email"
-                bg="#FFF2EF"
-                border="1px solid #d4b3baff"
-                borderRadius="md"
-                color="#3D0301"
-                _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
-                size={{ base: "md", md: "lg" }}
-              />
-            </Box>
+              <Field.Root invalid={!!errors.email}>
+                <Field.Label>Email</Field.Label>
+                <Input
+                  name="email"
+                  type="email"
+                  placeholder="Your Email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  bg="#FFF2EF"
+                  border="1px solid #d4b3baff"
+                  borderRadius="md"
+                  color="#3D0301"
+                  _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
+                  size={{ base: "md", md: "lg" }}
+                  required
+                />
+                {errors.email && (
+                  <Field.ErrorText>{errors.email}</Field.ErrorText>
+                )}
+              </Field.Root>
 
-            <Box w="full">
-              <Text color="#3D0301" fontWeight="semibold" mb={2}>
-                Message
-              </Text>
-              <Textarea
-                placeholder="Your Message"
-                bg="#FFF2EF"
-                border="1px solid #d4b3baff"
-                borderRadius="md"
-                color="#3D0301"
-                rows={{ base: 4, md: 5 }}
-                _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
-                size={{ base: "md", md: "lg" }}
-              />
-            </Box>
+              <Field.Root invalid={!!errors.message}>
+                <Field.Label>Message</Field.Label>
+                <Textarea
+                  name="message"
+                  placeholder="Your Message"
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  bg="#FFF2EF"
+                  border="1px solid #d4b3baff"
+                  borderRadius="md"
+                  color="#3D0301"
+                  rows={5}
+                  _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
+                  size={{ base: "md", md: "lg" }}
+                  required
+                />
+                {errors.message && (
+                  <Field.ErrorText>{errors.message}</Field.ErrorText>
+                )}
+              </Field.Root>
 
-            <Button
-              bg="#D76C82"
-              color="#EBE8DB"
-              borderRadius="full"
-              px={{ base: 4, md: 8 }}
-              py={{ base: 4, md: 6 }}
-              fontWeight="semibold"
-              _hover={{ bg: '#C95A78', transform: 'translateY(-2px)' }}
-              transition="all 0.3s"
-              boxShadow="lg"
-              w="full"
-              size={{ base: "md", md: "lg" }}
-            >
-              Send Message
-            </Button>
-          </VStack>
+              <Button
+                type="submit"
+                bg="#D76C82"
+                color="#EBE8DB"
+                borderRadius="full"
+                px={{ base: 4, md: 8 }}
+                py={{ base: 4, md: 6 }}
+                fontWeight="semibold"
+                _hover={{ bg: '#C95A78', transform: 'translateY(-2px)' }}
+                transition="all 0.3s"
+                boxShadow="lg"
+                w="full"
+                size={{ base: "md", md: "lg" }}
+                loading={isSubmitting}
+                loadingText="Sending..."
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Sending...' : 'Send Message'}
+              </Button>
+            </VStack>
+          </form>
         </Box>
       </Container>
     </Box>
@@ -528,6 +1201,7 @@ const Contact = () => {
 export default Contact;
 
 // File: c:\Users\ashre\Downloads\demo (1)\front\Portfolio\src\sections\LandingPage\LandingPage.tsx
+// File: sections/LandingPage/LandingPage.tsx
 import {
   Box,
   Flex,
@@ -537,12 +1211,34 @@ import {
   HStack,
   VStack,
   IconButton,
-} from '@chakra-ui/react';
-import { Download, Github, Linkedin, Mail, Dribbble } from 'lucide-react';
-import { Player } from '@lottiefiles/react-lottie-player';
-import animationData from '../../assets/animations/Coder.json';
+  Link,
+} from "@chakra-ui/react";
+import {
+  cilCloudDownload,
+  cibGithub,
+  cibLinkedinIn,
+  cibGmail,
+  cibWhatsapp,
+} from "@coreui/icons";
+import { CIcon } from "@coreui/icons-react";
+import { Player } from "@lottiefiles/react-lottie-player";
+import animationData from "../../assets/animations/Coder.json";
 
 const LandingPage = () => {
+  // Function to handle smooth scroll
+  const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const targetId = "myprojects";
+    const targetElement = document.getElementById(targetId);
+    
+    if (targetElement) {
+      targetElement.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
+
   return (
     <Box
       minH={{ base: "80vh", md: "100vh" }}
@@ -586,150 +1282,32 @@ const LandingPage = () => {
         />
       </Box>
 
-      <Box maxW="full" px={{ base: 4, md: 8 }} py={{ base: 8, md: 12 }} position="relative" zIndex={10}>
+      <Box
+        maxW="full"
+        px={{ base: 4, md: 8 }}
+        py={{ base: 8, md: 12 }}
+        position="relative"
+        zIndex={10}
+      >
         <Flex
-          direction={{ base: 'column', lg: 'row' }}
+          direction={{ base: "column", lg: "row" }}
           gap={{ base: 8, md: 12 }}
           align="center"
           minH={{ base: "auto", md: "100vh" }}
           maxW="7xl"
           mx="auto"
         >
-          <VStack align={{ base: 'center', lg: 'start' }} spacing={{ base: 4, md: 8 }} flex={1}>
-            <VStack align={{ base: 'center', lg: 'start' }} spacing={{ base: 2, md: 4 }}>
-              <VStack align={{ base: 'center', lg: 'start' }} spacing={{ base: 1, md: 2 }}>
-                <Heading
-                  color="#3D0301"
-                  fontSize={{ base: '2xl', sm: '3xl', md: '4xl', lg: '6xl' }}
-                  fontWeight="bold"
-                  textAlign={{ base: 'center', lg: 'left' }}
-                  lineHeight="1.1"
-                >
-                  Hi, I'm Shahd Najjar
-                </Heading>
-                
-                <Flex align="baseline" gap={3} wrap="wrap" justify={{ base: 'center', lg: 'start' }}>
-                  <Heading
-                    fontSize={{ base: 'xl', sm: '2xl', md: '3xl', lg: '5xl' }}
-                    fontWeight="bold"
-                    color="#B03052"
-                    lineHeight="1.3"
-                  >
-                    Full-Stack
-                  </Heading>
-                  <Heading
-                    color="#3D0301"
-                    fontSize={{ base: 'xl', sm: '2xl', md: '3xl', lg: '5xl' }}
-                    fontWeight="bold"
-                  >
-                    Developer
-                  </Heading>
-                </Flex>
-              </VStack>
-              
-              <Text
-                color="#3D0301"
-                opacity={0.8}
-                fontSize={{ base: 'sm', md: 'lg' }}
-                maxW={{ base: "90%", md: "md" }}
-                lineHeight="relaxed"
-                textAlign={{ base: 'center', lg: 'left' }}
-              >
-                Second-year Computer Science student passionate about web development and digital project management. I create robust and user-friendly web applications, transforming ideas into efficient digital solutions.
-              </Text>
-            </VStack>
-
-            <HStack spacing={{ base: 2, md: 4 }} wrap="wrap" justify={{ base: 'center', lg: 'start' }}>
-              <Button
-                bg="#D76C82"
-                color="#EBE8DB"
-                px={{ base: 4, md: 8 }}
-                py={{ base: 4, md: 6 }}
-                borderRadius="full"
-                fontWeight="semibold"
-                _hover={{ bg: '#C95A78' }}
-                transition="all 0.3s"
-                boxShadow="lg"
-                size={{ base: "md", md: "lg" }}
-              >
-                My Projects
-              </Button>
-              <Button
-                variant="outline"
-                bg="#EBE8DB"
-                color="#3D0301"
-                borderColor="#dab8bfff"
-                px={{ base: 4, md: 8 }}
-                py={{ base: 4, md: 6 }}
-                borderRadius="full"
-                fontWeight="semibold"
-                _hover={{ bg: '#E5E2D5' }}
-                transition="all 0.3s"
-                size={{ base: "md", md: "lg" }}
-              >
-                <Download size={{ base: 16, md: 18 }} style={{ marginRight: '8px' }} />
-                Download CV
-              </Button>
-            </HStack>
-
-            <HStack spacing={{ base: 2, md: 4 }}>
-              <IconButton
-                aria-label="GitHub"
-                w={{ base: 10, md: 12 }}
-                h={{ base: 10, md: 12 }}
-                bg="#EBE8DB"
-                color="#3D0301"
-                borderRadius="full"
-                border="1px solid #cdb5baff"
-                _hover={{ bg: '#E5E2D5' }}
-                transition="all 0.3s"
-              >
-                <Github size={{ base: 16, md: 20 }} />
-              </IconButton>
-              <IconButton
-                aria-label="LinkedIn"
-                w={{ base: 10, md: 12 }}
-                h={{ base: 10, md: 12 }}
-                bg="#EBE8DB"
-                color="#3D0301"
-                borderRadius="full"
-                border="1px solid #c0a9aeff"
-                _hover={{ bg: '#E5E2D5' }}
-                transition="all 0.3s"
-              >
-                <Linkedin size={{ base: 16, md: 20 }} />
-              </IconButton>
-              <IconButton
-                aria-label="Email"
-                w={{ base: 10, md: 12 }}
-                h={{ base: 10, md: 12 }}
-                bg="#EBE8DB"
-                color="#3D0301"
-                borderRadius="full"
-                border="1px solid #c0a9aeff"
-                _hover={{ bg: '#E5E2D5' }}
-                transition="all 0.3s"
-              >
-                <Mail size={{ base: 16, md: 20 }} />
-              </IconButton>
-              <IconButton
-                aria-label="Dribbble"
-                w={{ base: 10, md: 12 }}
-                h={{ base: 10, md: 12 }}
-                bg="#EBE8DB"
-                color="#3D0301"
-                borderRadius="full"
-                border="1px solid #c2a9aeff"
-                _hover={{ bg: '#E5E2D5' }}
-                transition="all 0.3s"
-              >
-                <Dribbble size={{ base: 16, md: 20 }} />
-              </IconButton>
-            </HStack>
-          </VStack>
-
-          <Flex justify={{ base: 'center', lg: 'end' }} flex={1}>
-            <Box position="relative" w={{ base: "80%", sm: "60%", md: "500px" }} h={{ base: "auto", md: "500px" }}>
+          {/* Lottie Animation - Shows first on mobile, second on desktop */}
+          <Flex
+            justify={{ base: "center", lg: "end" }}
+            flex={1}
+            order={{ base: 1, lg: 2 }}
+          >
+            <Box
+              position="relative"
+              w={{ base: "80%", sm: "60%", md: "500px" }}
+              h={{ base: "auto", md: "500px" }}
+            >
               <Box
                 w="100%"
                 h="100%"
@@ -742,11 +1320,250 @@ const LandingPage = () => {
                   loop
                   speed={0.8}
                   src={animationData}
-                  style={{ width: '100%', height: '100%', maxWidth: '500px', maxHeight: '500px' }}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    maxWidth: "500px",
+                    maxHeight: "500px",
+                  }}
                 />
               </Box>
             </Box>
           </Flex>
+
+          {/* Text Content - Shows second on mobile, first on desktop */}
+          <VStack
+            align={{ base: "center", lg: "start" }}
+            gap={{ base: 4, md: 8 }}
+            flex={1}
+            order={{ base: 2, lg: 1 }}
+          >
+            <VStack
+              align={{ base: "center", lg: "start" }}
+              gap={{ base: 2, md: 4 }}
+            >
+              <VStack
+                align={{ base: "center", lg: "start" }}
+                gap={{ base: 1, md: 2 }}
+              >
+                <Heading
+                  color="#3D0301"
+                  fontSize={{ base: "2xl", sm: "3xl", md: "4xl", lg: "6xl" }}
+                  fontWeight="bold"
+                  textAlign={{ base: "center", lg: "left" }}
+                  lineHeight="1.1"
+                >
+                  Hi, I'm Shahd Najjar
+                </Heading>
+
+                <Flex
+                  align="baseline"
+                  gap={3}
+                  wrap="wrap"
+                  justify={{ base: "center", lg: "start" }}
+                >
+                  <Heading
+                    fontSize={{ base: "xl", sm: "2xl", md: "3xl", lg: "5xl" }}
+                    fontWeight="bold"
+                    color="#B03052"
+                    lineHeight="1.3"
+                  >
+                    Full-Stack
+                  </Heading>
+                  <Heading
+                    color="#3D0301"
+                    fontSize={{ base: "xl", sm: "2xl", md: "3xl", lg: "5xl" }}
+                    fontWeight="bold"
+                  >
+                    Developer
+                  </Heading>
+                </Flex>
+              </VStack>
+
+              <Text
+                color="#3D0301"
+                opacity={0.8}
+                fontSize={{ base: "sm", md: "lg" }}
+                maxW={{ base: "90%", md: "md" }}
+                lineHeight="relaxed"
+                textAlign={{ base: "center", lg: "left" }}
+              >
+                Second-year Computer Science student passionate about web
+                development and digital project management. I create robust and
+                user-friendly web applications, transforming ideas into
+                efficient digital solutions.
+              </Text>
+            </VStack>
+
+            <HStack
+              gap={{ base: 2, md: 4 }}
+              wrap="wrap"
+              justify={{ base: "center", lg: "start" }}
+            >
+              <Link href="#myprojects" textDecoration="none" onClick={handleSmoothScroll}>
+                <Button
+                  bg="#D76C82"
+                  color="#EBE8DB"
+                  px={{ base: 4, md: 8 }}
+                  py={{ base: 4, md: 6 }}
+                  borderRadius="full"
+                  fontWeight="semibold"
+                  _hover={{ bg: "#C95A78" }}
+                  transition="all 0.3s"
+                  boxShadow="lg"
+                  size={{ base: "md", md: "lg" }}
+                >
+                  My Projects
+                </Button>
+              </Link>
+
+              <Link
+                href="/Portfolio/cv.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                textDecoration="none"
+              >
+                <Button
+                  variant="outline"
+                  bg="#EBE8DB"
+                  color="#3D0301"
+                  borderColor="#dab8bfff"
+                  px={{ base: 4, md: 8 }}
+                  py={{ base: 4, md: 6 }}
+                  borderRadius="full"
+                  fontWeight="semibold"
+                  _hover={{ bg: "#E5E2D5" }}
+                  transition="all 0.3s"
+                  size={{ base: "md", md: "lg" }}
+                >
+                  <CIcon
+                    icon={cilCloudDownload}
+                    size="sm"
+                    style={{ marginRight: "8px" }}
+                  />
+                  Download CV
+                </Button>
+              </Link>
+            </HStack>
+
+            <HStack gap={{ base: 2, md: 4 }}>
+              <Link
+                href="https://github.com/shahdnajjar"
+                target="_blank"
+                rel="noopener noreferrer"
+                _hover={{ textDecoration: "none" }}
+              >
+                <IconButton
+                  aria-label="GitHub"
+                  w={{ base: 10, md: 12 }}
+                  h={{ base: 10, md: 12 }}
+                  bg="#EBE8DB"
+                  color="#3D0301"
+                  borderRadius="full"
+                  border="1px solid #cdb5baff"
+                  _hover={{ bg: "#E5E2D5" }}
+                  transition="all 0.3s"
+                >
+                  <CIcon
+                    icon={cibGithub}
+                    width={28}
+                    height={28}
+                    style={{
+                      fill: "#D76C82",
+                      transition: "all 0.3s",
+                    }}
+                  />
+                </IconButton>
+              </Link>
+
+              <Link
+                href="https://www.linkedin.com/in/shahd-najjar-5228a620a"
+                target="_blank"
+                rel="noopener noreferrer"
+                _hover={{ textDecoration: "none" }}
+              >
+                <IconButton
+                  aria-label="LinkedIn"
+                  w={{ base: 10, md: 12 }}
+                  h={{ base: 10, md: 12 }}
+                  bg="#EBE8DB"
+                  color="#3D0301"
+                  borderRadius="full"
+                  border="1px solid #c0a9aeff"
+                  _hover={{ bg: "#E5E2D5" }}
+                  transition="all 0.3s"
+                >
+                  <CIcon
+                    icon={cibLinkedinIn}
+                    width={28}
+                    height={28}
+                    style={{
+                      fill: "#D76C82",
+                      transition: "all 0.3s",
+                    }}
+                  />
+                </IconButton>
+              </Link>
+
+              <Link
+                href="mailto:shahdnajjar50@gmail.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                _hover={{ textDecoration: "none" }}
+              >
+                <IconButton
+                  aria-label="Gmail"
+                  w={{ base: 10, md: 12 }}
+                  h={{ base: 10, md: 12 }}
+                  bg="#EBE8DB"
+                  color="#3D0301"
+                  borderRadius="full"
+                  border="1px solid #c0a9aeff"
+                  _hover={{ bg: "#E5E2D5" }}
+                  transition="all 0.3s"
+                >
+                  <CIcon
+                    icon={cibGmail}
+                    width={28}
+                    height={28}
+                    style={{
+                      fill: "#D76C82",
+                      transition: "all 0.3s",
+                    }}
+                  />
+                </IconButton>
+              </Link>
+
+              <Link
+                href="https://wa.me/+21694243333"
+                target="_blank"
+                rel="noopener noreferrer"
+                _hover={{ textDecoration: "none" }}
+              >
+                <IconButton
+                  aria-label="WhatsApp"
+                  w={{ base: 10, md: 12 }}
+                  h={{ base: 10, md: 12 }}
+                  bg="#EBE8DB"
+                  color="#3D0301"
+                  borderRadius="full"
+                  border="1px solid #c2a9aeff"
+                  _hover={{ bg: "#E5E2D5" }}
+                  transition="all 0.3s"
+                >
+                  <CIcon
+                    icon={cibWhatsapp}
+                    width={28}
+                    height={28}
+                    style={{
+                      fill: "#D76C82",
+                      transition: "all 0.3s",
+                    }}
+                  />
+                </IconButton>
+              </Link>
+            </HStack>
+          </VStack>
         </Flex>
       </Box>
     </Box>
@@ -756,11 +1573,11 @@ const LandingPage = () => {
 export default LandingPage;
 
 // File: c:\Users\ashre\Downloads\demo (1)\front\Portfolio\src\sections\Projects\Projects.tsx
-import React, { useState } from 'react';
+// File: sections/Projects/Projects.tsx
+import { useState } from 'react';
 import {
   Box,
   Container,
-  Flex,
   Text,
   Heading,
   VStack,
@@ -768,13 +1585,14 @@ import {
   Grid,
   GridItem,
   Button,
+  Badge,
   DialogRoot,
   DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogBody,
   DialogCloseTrigger,
-  Badge,
+  DialogTitle,
 } from '@chakra-ui/react';
 
 interface Project {
@@ -960,8 +1778,10 @@ const Projects = () => {
                       <Heading color="#5D688A" fontSize={{ base: "lg", md: "xl" }} fontWeight="bold">
                         {project.title}
                       </Heading>
-                      <Text color="#5D688A" opacity={0.7} fontSize={{ base: "xs", md: "sm" }} noOfLines={2}>
-                        {project.description}
+                      <Text color="#5D688A" opacity={0.7} fontSize={{ base: "xs", md: "sm" }}>
+                        {project.description.length > 100 
+                          ? `${project.description.substring(0, 100)}...` 
+                          : project.description}
                       </Text>
                     </VStack>
                   </Box>
@@ -976,9 +1796,9 @@ const Projects = () => {
                   mx="auto"
                 >
                   <DialogHeader>
-                    <Heading color="#5D688A" fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold">
+                    <DialogTitle color="#5D688A" fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold">
                       {project.title}
-                    </Heading>
+                    </DialogTitle>
                     <DialogCloseTrigger color="#5D688A" />
                   </DialogHeader>
                   <DialogBody pb={6}>
@@ -1037,7 +1857,9 @@ const Projects = () => {
 
 export default Projects;
 
+
 // File: c:\Users\ashre\Downloads\demo (1)\front\Portfolio\src\sections\Skills\Skills.tsx
+// File: sections/Skills/Skills.tsx
 import { useState, useEffect } from 'react';
 import {
   Box,
@@ -1068,6 +1890,127 @@ interface Skill {
   logo?: string;
   color: string;
 }
+
+// Extracted component for skill icon rendering
+const SkillIcon = ({ skill, isActive, isHovered }: { skill: Skill; isActive: boolean; isHovered: boolean }) => {
+  const iconFilter = isActive || isHovered ? 'brightness(1.1) saturate(1.2)' : 'brightness(0.9)';
+  const iconSize = { base: "48px", md: "64px" };
+
+  if (skill.icon) {
+    return (
+      <Box display="flex" alignItems="center" justifyContent="center" w={iconSize} h={iconSize}>
+        <FontAwesomeIcon
+          icon={skill.icon}
+          size="2x"
+          color={skill.color}
+          style={{ filter: iconFilter, transition: 'all 0.3s' }}
+        />
+      </Box>
+    );
+  }
+
+  if (skill.coreIcon) {
+    return (
+      <Box display="flex" alignItems="center" justifyContent="center" w={iconSize} h={iconSize}>
+        <CIcon
+          icon={skill.coreIcon}
+          width={48}
+          height={48}
+          color={skill.color}
+          style={{
+            filter: `brightness(${isActive || isHovered ? 1.1 : 0.9}) saturate(${isActive || isHovered ? 1.2 : 1})`,
+            transition: 'all 0.3s',
+            fill: skill.color
+          }}
+        />
+      </Box>
+    );
+  }
+
+  if (skill.logo) {
+    return (
+      <Image
+        src={skill.logo}
+        alt={`${skill.name} logo`}
+        boxSize={iconSize}
+        objectFit="contain"
+        filter={iconFilter}
+        transition="all 0.3s"
+      />
+    );
+  }
+
+  return null;
+};
+
+// Extracted component for skill card
+const SkillCard = ({ 
+  skill, 
+  index, 
+  glowIndex, 
+  activeSkill, 
+  setActiveSkill 
+}: { 
+  skill: Skill; 
+  index: number; 
+  glowIndex: number; 
+  activeSkill: string | null; 
+  setActiveSkill: (name: string | null) => void; 
+}) => {
+  const isActive = glowIndex === index;
+  const isHovered = activeSkill === skill.name;
+
+  return (
+    <GridItem
+      key={skill.name}
+      bg="#EBE8DB"
+      borderRadius="2xl"
+      border={isActive || isHovered ? `2px solid ${skill.color}` : '1px solid rgba(61, 3, 1, 0.3)'}
+      p={{ base: 4, md: 6 }}
+      transition="all 0.3s"
+      _hover={{
+        transform: 'translateY(-8px)',
+        boxShadow: `0 12px 40px ${skill.color}40`,
+      }}
+      cursor="pointer"
+      onMouseEnter={() => setActiveSkill(skill.name)}
+      onMouseLeave={() => setActiveSkill(null)}
+      position="relative"
+    >
+      {isActive && (
+        <Box
+          position="absolute"
+          top={{ base: "8px", md: "12px" }}
+          right={{ base: "8px", md: "12px" }}
+          w="8px"
+          h="8px"
+          bg={skill.color}
+          borderRadius="full"
+          animation="ping 1s infinite"
+        />
+      )}
+      <VStack align="center" gap={{ base: 2, md: 3 }}>
+        <SkillIcon skill={skill} isActive={isActive} isHovered={isHovered} />
+
+        <Text fontSize={{ base: "sm", md: "md" }} fontWeight="semibold" color="#3D0301" textAlign="center">
+          {skill.name}
+        </Text>
+
+        <Text
+          fontSize={{ base: "xs", md: "xs" }}
+          px={{ base: 2, md: 3 }}
+          py={1}
+          borderRadius="full"
+          border={`1px solid ${skill.color}`}
+          bg={isActive || isHovered ? `${skill.color}20` : '#EBE8DB'}
+          color={isActive || isHovered ? skill.color : '#3D0301'}
+        >
+          {skill.category}
+        </Text>
+      </VStack>
+    </GridItem>
+  );
+};
 
 const Skills = () => {
   const [activeSkill, setActiveSkill] = useState<string | null>(null);
@@ -1176,102 +2119,16 @@ const Skills = () => {
           templateColumns={{ base: 'repeat(auto-fit, minmax(120px, 1fr))', sm: 'repeat(auto-fit, minmax(140px, 1fr))', md: 'repeat(auto-fit, minmax(160px, 1fr))' }}
           gap={{ base: 4, md: 6 }}
         >
-          {filteredSkills.map((skill, index) => {
-            const isActive = glowIndex === index;
-            const isHovered = activeSkill === skill.name;
-
-            return (
-              <GridItem
-                key={skill.name}
-                bg="#EBE8DB"
-                borderRadius="2xl"
-                border={isActive || isHovered ? `2px solid ${skill.color}` : '1px solid rgba(61, 3, 1, 0.3)'}
-                p={{ base: 4, md: 6 }}
-                transition="all 0.3s"
-                _hover={{
-                  transform: 'translateY(-8px)',
-                  boxShadow: `0 12px 40px ${skill.color}40`,
-                }}
-                cursor="pointer"
-                onMouseEnter={() => setActiveSkill(skill.name)}
-                onMouseLeave={() => setActiveSkill(null)}
-                position="relative"
-              >
-                {isActive && (
-                  <Box
-                    position="absolute"
-                    top={{ base: "8px", md: "12px" }}
-                    right={{ base: "8px", md: "12px" }}
-                    w="8px"
-                    h="8px"
-                    bg={skill.color}
-                    borderRadius="full"
-                    animation="ping 1s infinite"
-                  />
-                )}
-                <VStack align="center" gap={{ base: 2, md: 3 }}>
-                  {skill.icon ? (
-                    <Box display="flex" alignItems="center" justifyContent="center" w={{ base: "48px", md: "64px" }} h={{ base: "48px", md: "64px" }}>
-                      <FontAwesomeIcon
-                        icon={skill.icon}
-                        size={{ base: "2x", md: "3x" }}
-                        color={skill.color}
-                        style={{
-                          filter: isActive || isHovered ? 'brightness(1.1) saturate(1.2)' : 'brightness(0.9)',
-                          transition: 'all 0.3s'
-                        }}
-                      />
-                    </Box>
-                  ) : skill.coreIcon ? (
-                    <Box
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                      w={{ base: "48px", md: "64px" }}
-                      h={{ base: "48px", md: "64px" }}
-                    >
-                      <CIcon
-                        icon={skill.coreIcon}
-                        width={{ base: 36, md: 48 }}
-                        height={{ base: 36, md: 48 }}
-                        color={skill.color}
-                        style={{
-                          filter: `brightness(${isActive || isHovered ? 1.1 : 0.9}) saturate(${isActive || isHovered ? 1.2 : 1})`,
-                          transition: 'all 0.3s',
-                          fill: skill.color
-                        }}
-                      />
-                    </Box>
-                  ) : skill.logo ? (
-                    <Image
-                      src={skill.logo}
-                      alt={`${skill.name} logo`}
-                      boxSize={{ base: "48px", md: "64px" }}
-                      objectFit="contain"
-                      filter={isActive || isHovered ? 'brightness(1.1) saturate(1.2)' : 'brightness(0.9)'}
-                      transition="all 0.3s"
-                    />
-                  ) : null}
-
-                  <Text fontSize={{ base: "sm", md: "md" }} fontWeight="semibold" color="#3D0301" textAlign="center">
-                    {skill.name}
-                  </Text>
-
-                  <Text
-                    fontSize={{ base: "xs", md: "xs" }}
-                    px={{ base: 2, md: 3 }}
-                    py={1}
-                    borderRadius="full"
-                    border={`1px solid ${skill.color}`}
-                    bg={isActive || isHovered ? `${skill.color}20` : '#EBE8DB'}
-                    color={isActive || isHovered ? skill.color : '#3D0301'}
-                  >
-                    {skill.category}
-                  </Text>
-                </VStack>
-              </GridItem>
-            );
-          })}
+          {filteredSkills.map((skill, index) => (
+            <SkillCard
+              key={skill.name}
+              skill={skill}
+              index={index}
+              glowIndex={glowIndex}
+              activeSkill={activeSkill}
+              setActiveSkill={setActiveSkill}
+            />
+          ))}
         </Grid>
       </Container>
 
@@ -1287,4 +2144,5 @@ const Skills = () => {
 };
 
 export default Skills;
-
+//env
+VITE_API_URL="https://back-prm4.onrender.com"

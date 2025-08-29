@@ -1,4 +1,5 @@
 // File: sections/Contact/Contact.tsx
+import { useState } from 'react';
 import {
   Box,
   Container,
@@ -9,9 +10,85 @@ import {
   Button,
   Text,
   Field,
+  Alert,
 } from '@chakra-ui/react';
+import env from 'react-dotenv';
+interface ContactForm {
+  name: string;
+  email: string;
+  message: string;
+}
+
+interface ApiResponse {
+  success: boolean;
+  message: string;
+  errors?: { [key: string]: string };
+}
 
 const Contact = () => {
+  const [formData, setFormData] = useState<ContactForm>({
+    name: '',
+    email: '',
+    message: ''
+  });
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [response, setResponse] = useState<ApiResponse | null>(null);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  // File: src/sections/Contact/Contact.tsx
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsSubmitting(true);
+  setResponse(null);
+  setErrors({});
+
+  try {
+    const response = await fetch(`${env.VITE_API_URL}/api/contacts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data: ApiResponse = await response.json();
+    
+    if (data.success) {
+      setResponse(data);
+      setFormData({ name: '', email: '', message: '' });
+    } else {
+      setResponse(data);
+      if (data.errors) {
+        setErrors(data.errors);
+      }
+    }
+  } catch (error) {
+    setResponse({
+      success: false,
+      message: 'Network error. Please check your connection and try again.'
+    });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
   return (
     <Box
       minH={{ base: "auto", md: "100vh" }}
@@ -57,6 +134,19 @@ const Contact = () => {
           <Box w="80px" h="4px" bg="#D76C82" borderRadius="full" />
         </VStack>
 
+        {/* Response Alert */}
+        {response && (
+          <Box mb={6} maxW={{ base: "100%", md: "600px" }} mx="auto">
+            <Alert.Root status={response.success ? "success" : "error"}>
+              <Alert.Indicator />
+              <Alert.Title>
+                {response.success ? "Message Sent!" : "Error"}
+              </Alert.Title>
+              <Alert.Description>{response.message}</Alert.Description>
+            </Alert.Root>
+          </Box>
+        )}
+
         <Box
           bg="#EBE8DB"
           borderRadius="3xl"
@@ -69,65 +159,92 @@ const Contact = () => {
           transition="all 0.3s"
           _hover={{ borderColor: '#c4a6aeff' }}
         >
-          <VStack gap={{ base: 4, md: 6 }} align="start">
-            <Field.Root>
-              <Field.Label>Name</Field.Label>
-              <Input
-                type="text"
-                placeholder="Your Name"
-                bg="#FFF2EF"
-                border="1px solid #d4b3baff"
-                borderRadius="md"
-                color="#3D0301"
-                _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
-                size={{ base: "md", md: "lg" }}
-              />
-            </Field.Root>
+          <form onSubmit={handleSubmit}>
+            <VStack gap={{ base: 4, md: 6 }} align="start">
+              <Field.Root invalid={!!errors.name}>
+                <Field.Label>Name</Field.Label>
+                <Input
+                  name="name"
+                  type="text"
+                  placeholder="Your Name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  bg="#FFF2EF"
+                  border="1px solid #d4b3baff"
+                  borderRadius="md"
+                  color="#3D0301"
+                  _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
+                  size={{ base: "md", md: "lg" }}
+                  required
+                />
+                {errors.name && (
+                  <Field.ErrorText>{errors.name}</Field.ErrorText>
+                )}
+              </Field.Root>
 
-            <Field.Root>
-              <Field.Label>Email</Field.Label>
-              <Input
-                type="email"
-                placeholder="Your Email"
-                bg="#FFF2EF"
-                border="1px solid #d4b3baff"
-                borderRadius="md"
-                color="#3D0301"
-                _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
-                size={{ base: "md", md: "lg" }}
-              />
-            </Field.Root>
+              <Field.Root invalid={!!errors.email}>
+                <Field.Label>Email</Field.Label>
+                <Input
+                  name="email"
+                  type="email"
+                  placeholder="Your Email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  bg="#FFF2EF"
+                  border="1px solid #d4b3baff"
+                  borderRadius="md"
+                  color="#3D0301"
+                  _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
+                  size={{ base: "md", md: "lg" }}
+                  required
+                />
+                {errors.email && (
+                  <Field.ErrorText>{errors.email}</Field.ErrorText>
+                )}
+              </Field.Root>
 
-            <Field.Root>
-              <Field.Label>Message</Field.Label>
-              <Textarea
-                placeholder="Your Message"
-                bg="#FFF2EF"
-                border="1px solid #d4b3baff"
-                borderRadius="md"
-                color="#3D0301"
-                rows={5}
-                _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
-                size={{ base: "md", md: "lg" }}
-              />
-            </Field.Root>
+              <Field.Root invalid={!!errors.message}>
+                <Field.Label>Message</Field.Label>
+                <Textarea
+                  name="message"
+                  placeholder="Your Message"
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  bg="#FFF2EF"
+                  border="1px solid #d4b3baff"
+                  borderRadius="md"
+                  color="#3D0301"
+                  rows={5}
+                  _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
+                  size={{ base: "md", md: "lg" }}
+                  required
+                />
+                {errors.message && (
+                  <Field.ErrorText>{errors.message}</Field.ErrorText>
+                )}
+              </Field.Root>
 
-            <Button
-              bg="#D76C82"
-              color="#EBE8DB"
-              borderRadius="full"
-              px={{ base: 4, md: 8 }}
-              py={{ base: 4, md: 6 }}
-              fontWeight="semibold"
-              _hover={{ bg: '#C95A78', transform: 'translateY(-2px)' }}
-              transition="all 0.3s"
-              boxShadow="lg"
-              w="full"
-              size={{ base: "md", md: "lg" }}
-            >
-              Send Message
-            </Button>
-          </VStack>
+              <Button
+                type="submit"
+                bg="#D76C82"
+                color="#EBE8DB"
+                borderRadius="full"
+                px={{ base: 4, md: 8 }}
+                py={{ base: 4, md: 6 }}
+                fontWeight="semibold"
+                _hover={{ bg: '#C95A78', transform: 'translateY(-2px)' }}
+                transition="all 0.3s"
+                boxShadow="lg"
+                w="full"
+                size={{ base: "md", md: "lg" }}
+                loading={isSubmitting}
+                loadingText="Sending..."
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Sending...' : 'Send Message'}
+              </Button>
+            </VStack>
+          </form>
         </Box>
       </Container>
     </Box>
