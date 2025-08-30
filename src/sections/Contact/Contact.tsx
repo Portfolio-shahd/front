@@ -36,8 +36,8 @@ const Contact = () => {
   const [response, setResponse] = useState<ApiResponse | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  // Use Vite's environment variable directly
-  const API_URL = (import.meta as any).VITE_API_URL || 'https://back-prm4.onrender.com';
+  // Hardcode API URL to avoid TypeScript issues
+  const API_URL = 'https://back-prm4.onrender.com';
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -53,10 +53,49 @@ const Contact = () => {
         [name]: ''
       }));
     }
+    
+    // Clear response when user starts typing
+    if (response) {
+      setResponse(null);
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: { [key: string]: string } = {};
+    
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email';
+    }
+    
+    if (!formData.message.trim()) {
+      newErrors.message = 'Message is required';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log('=== FORM SUBMIT TRIGGERED ===');
+    console.log('Event:', e);
+    
     e.preventDefault();
+    
+    console.log('Form data before validation:', formData);
+    
+    // Validate form before submitting
+    if (!validateForm()) {
+      console.log('Form validation failed:', errors);
+      return;
+    }
+
+    console.log('Form validation passed, proceeding with API call');
     setIsSubmitting(true);
     setResponse(null);
     setErrors({});
@@ -88,6 +127,7 @@ const Contact = () => {
       
       if (data.success) {
         setResponse(data);
+        // Reset form only on success
         setFormData({ name: '', email: '', message: '' });
       } else {
         setResponse(data);
@@ -103,6 +143,20 @@ const Contact = () => {
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Test function for debugging
+  const testApiConnection = async () => {
+    console.log('Test button clicked');
+    try {
+      const testResponse = await fetch(`${API_URL}/api/contacts/test`);
+      const testData = await testResponse.json();
+      console.log('Test response:', testData);
+      alert('Test successful! Check console for details.');
+    } catch (error) {
+      console.error('Test failed:', error);
+      alert('Test failed! Check console for details.');
     }
   };
 
@@ -151,11 +205,12 @@ const Contact = () => {
           <Box w="80px" h="4px" bg="#D76C82" borderRadius="full" />
         </VStack>
 
-        {/* Debug info - remove this in production */}
+        {/* Debug info */}
         <Box mb={4} p={4} bg="yellow.100" borderRadius="md" fontSize="sm">
           <Text><strong>Debug Info:</strong></Text>
           <Text>API URL: {API_URL}</Text>
-          <Text>Environment: {(import.meta as any).env.MODE}</Text>
+          <Text>Form Data: {JSON.stringify(formData)}</Text>
+          <Text>Is Submitting: {isSubmitting.toString()}</Text>
         </Box>
 
         {/* Response Alert */}
@@ -186,7 +241,7 @@ const Contact = () => {
           <form onSubmit={handleSubmit}>
             <VStack gap={{ base: 4, md: 6 }} align="start">
               <Field.Root invalid={!!errors.name}>
-                <Field.Label>Name</Field.Label>
+                <Field.Label color="#3D0301" fontWeight="medium">Name *</Field.Label>
                 <Input
                   name="name"
                   type="text"
@@ -198,16 +253,17 @@ const Contact = () => {
                   borderRadius="md"
                   color="#3D0301"
                   _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
+                  _placeholder={{ color: '#3D0301', opacity: 0.6 }}
                   size={{ base: "md", md: "lg" }}
                   required
                 />
                 {errors.name && (
-                  <Field.ErrorText>{errors.name}</Field.ErrorText>
+                  <Field.ErrorText color="#B03052">{errors.name}</Field.ErrorText>
                 )}
               </Field.Root>
 
               <Field.Root invalid={!!errors.email}>
-                <Field.Label>Email</Field.Label>
+                <Field.Label color="#3D0301" fontWeight="medium">Email *</Field.Label>
                 <Input
                   name="email"
                   type="email"
@@ -219,16 +275,17 @@ const Contact = () => {
                   borderRadius="md"
                   color="#3D0301"
                   _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
+                  _placeholder={{ color: '#3D0301', opacity: 0.6 }}
                   size={{ base: "md", md: "lg" }}
                   required
                 />
                 {errors.email && (
-                  <Field.ErrorText>{errors.email}</Field.ErrorText>
+                  <Field.ErrorText color="#B03052">{errors.email}</Field.ErrorText>
                 )}
               </Field.Root>
 
               <Field.Root invalid={!!errors.message}>
-                <Field.Label>Message</Field.Label>
+                <Field.Label color="#3D0301" fontWeight="medium">Message *</Field.Label>
                 <Textarea
                   name="message"
                   placeholder="Your Message"
@@ -240,11 +297,12 @@ const Contact = () => {
                   color="#3D0301"
                   rows={5}
                   _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
+                  _placeholder={{ color: '#3D0301', opacity: 0.6 }}
                   size={{ base: "md", md: "lg" }}
                   required
                 />
                 {errors.message && (
-                  <Field.ErrorText>{errors.message}</Field.ErrorText>
+                  <Field.ErrorText color="#B03052">{errors.message}</Field.ErrorText>
                 )}
               </Field.Root>
 
@@ -257,15 +315,37 @@ const Contact = () => {
                 py={{ base: 4, md: 6 }}
                 fontWeight="semibold"
                 _hover={{ bg: '#C95A78', transform: 'translateY(-2px)' }}
+                _disabled={{ 
+                  bg: '#D76C82', 
+                  opacity: 0.6, 
+                  cursor: 'not-allowed',
+                  transform: 'none'
+                }}
                 transition="all 0.3s"
                 boxShadow="lg"
                 w="full"
                 size={{ base: "md", md: "lg" }}
-                loading={isSubmitting}
-                loadingText="Sending..."
                 disabled={isSubmitting}
+                onClick={(e) => {
+                  console.log('=== BUTTON CLICKED ===');
+                  console.log('Button event:', e);
+                  console.log('Form data at button click:', formData);
+                  // Let the form's onSubmit handle the submission
+                }}
               >
                 {isSubmitting ? 'Sending...' : 'Send Message'}
+              </Button>
+              
+              {/* Test button for debugging */}
+              <Button
+                onClick={testApiConnection}
+                bg="gray.500"
+                color="white"
+                size="sm"
+                w="full"
+                mt={2}
+              >
+                Test API Connection
               </Button>
             </VStack>
           </form>
