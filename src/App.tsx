@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import { Box } from "@chakra-ui/react";
 import Navbar from "./components/ui/navbar";
 import LandingPage from "./sections/LandingPage/LandingPage";
@@ -41,7 +41,7 @@ const Portfolio = () => (
 
 function App() {
   return (
-    <Router basename="/Portfolio">
+    <Router>
       <Routes>
         <Route path="/" element={<Portfolio />} />
         <Route path="/seeshahdoudascontact" element={<ContactsAdminPage />} />
