@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
-    "build:prod": "VITE_API_URL=https://back-prm4.onrender.com npm run build"
+    "build:prod": "npm run build"
 },
   "homepage": "https://portfolio-shahd.github.io/front",
   "dependencies": {
