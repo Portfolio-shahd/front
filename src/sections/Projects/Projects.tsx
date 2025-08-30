@@ -57,7 +57,7 @@ const projects: Project[] = [
   {
     id: 4,
     title: 'INAT-Institut national agronomique de Tunisie',
-description: "Conception et développement d'un site web WordPress sur mesure avec des fonctionnalités avancées. Intégration de plugins personnalisés, optimisation du référencement (SEO) et mise en place d’un design responsive moderne, adapté aux besoins spécifiques de l'INAT.",
+    description: "Conception et développement d'un site web WordPress sur mesure avec des fonctionnalités avancées. Intégration de plugins personnalisés, optimisation du référencement (SEO) et mise en place d'un design responsive moderne, adapté aux besoins spécifiques de l'INAT.",
     category: 'Web Development',
     image: 'https://via.placeholder.com/400x300',
     link: '#',
@@ -78,14 +78,14 @@ description: "Conception et développement d'un site web WordPress sur mesure av
     image: 'https://via.placeholder.com/400x300',
     link: '#',
   },
-{
-  id: 7,
-  title: 'Thermecatex – Site Web Corporate',
-  description: "Conception et développement d'un site web corporate moderne pour THERMECATEX, entreprise spécialisée dans la fabrication et maintenance d'appareils sous pression et le traitement des eaux industrielles. Design responsive, présentation claire des services et interface optimisée pour la conversion client.",
-  category: 'Web Development',
-  image: 'https://via.placeholder.com/400x300',
-  link: '#',
-},
+  {
+    id: 7,
+    title: 'Thermecatex – Site Web Corporate',
+    description: "Conception et développement d'un site web corporate moderne pour THERMECATEX, entreprise spécialisée dans la fabrication et maintenance d'appareils sous pression et le traitement des eaux industrielles. Design responsive, présentation claire des services et interface optimisée pour la conversion client.",
+    category: 'Web Development',
+    image: 'https://via.placeholder.com/400x300',
+    link: '#',
+  },
   {
     id: 8,
     title: 'Portfolio Website',
@@ -197,6 +197,9 @@ const Projects = () => {
                       boxShadow: '0 12px 40px rgba(247, 165, 165, 0.3)',
                     }}
                     cursor="pointer"
+                    h={{ base: "320px", md: "380px" }}
+                    display="flex"
+                    flexDirection="column"
                   >
                     <Box
                       w="full"
@@ -208,6 +211,7 @@ const Projects = () => {
                       alignItems="center"
                       justifyContent="center"
                       overflow="hidden"
+                      flexShrink={0}
                     >
                       {project.image ? (
                         <img 
@@ -221,25 +225,27 @@ const Projects = () => {
                         </Text>
                       )}
                     </Box>
-                    <VStack align="start" gap={{ base: 2, md: 3 }}>
-                      <Badge
-                        bg="#FFDBB6"
-                        color="#5D688A"
-                        px={{ base: 2, md: 3 }}
-                        py={1}
-                        borderRadius="full"
-                        fontSize={{ base: "xs", md: "xs" }}
-                      >
-                        {project.category}
-                      </Badge>
-                      <Heading color="#5D688A" fontSize={{ base: "lg", md: "xl" }} fontWeight="bold">
-                        {project.title}
-                      </Heading>
-                      <Text color="#5D688A" opacity={0.7} fontSize={{ base: "xs", md: "sm" }}>
-                        {project.description.length > 100 
-                          ? `${project.description.substring(0, 100)}...` 
-                          : project.description}
-                      </Text>
+                    <VStack align="start" gap={{ base: 2, md: 3 }} flex="1" justify="space-between">
+                      <VStack align="start" gap={{ base: 2, md: 3 }} flex="1">
+                        <Badge
+                          bg="#FFDBB6"
+                          color="#5D688A"
+                          px={{ base: 2, md: 3 }}
+                          py={1}
+                          borderRadius="full"
+                          fontSize={{ base: "xs", md: "xs" }}
+                        >
+                          {project.category}
+                        </Badge>
+                        <Heading color="#5D688A" fontSize={{ base: "lg", md: "xl" }} fontWeight="bold">
+                          {project.title}
+                        </Heading>
+                        <Text color="#5D688A" opacity={0.7} fontSize={{ base: "xs", md: "sm" }}>
+                          {project.description.length > 100 
+                            ? `${project.description.substring(0, 100)}...` 
+                            : project.description}
+                        </Text>
+                      </VStack>
                     </VStack>
                   </Box>
                 </DialogTrigger>
