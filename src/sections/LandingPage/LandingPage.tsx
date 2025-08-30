@@ -215,7 +215,7 @@ const LandingPage = () => {
               </Link>
 
               <Link
-                href="/Portfolio/cv.pdf"
+                href="/front/cv.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
                 textDecoration="none"
