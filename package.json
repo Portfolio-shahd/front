@@ -12,7 +12,7 @@
     "deploy": "gh-pages -d dist",
     "build:prod": "VITE_API_URL=https://back-prm4.onrender.com npm run build"
 },
-  "homepage": "https://shahdnajjar.github.io/Portfolio",
+  "homepage": "https://portfolio-shahd.github.io/front",
   "dependencies": {
     "@chakra-ui/react": "^3.25.0",
     "@coreui/icons": "^3.0.1",
