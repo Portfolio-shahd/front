@@ -1,4 +1,4 @@
-// File: sections/Contact/Contact.tsx
+// File: src/sections/Contact/Contact.tsx
 import { useState } from 'react';
 import {
   Box,
@@ -12,7 +12,7 @@ import {
   Field,
   Alert,
 } from '@chakra-ui/react';
-import env from 'react-dotenv';
+
 interface ContactForm {
   name: string;
   email: string;
@@ -36,6 +36,9 @@ const Contact = () => {
   const [response, setResponse] = useState<ApiResponse | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
+  // Use Vite's environment variable directly
+  const API_URL = (import.meta as any).VITE_API_URL || 'https://back-prm4.onrender.com';
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -52,42 +55,56 @@ const Contact = () => {
     }
   };
 
-  // File: src/sections/Contact/Contact.tsx
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setIsSubmitting(true);
-  setResponse(null);
-  setErrors({});
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setResponse(null);
+    setErrors({});
 
-  try {
-    const response = await fetch(`${env.VITE_API_URL}/api/contacts`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
+    console.log('Submitting to:', `${API_URL}/api/contacts`);
+    console.log('Form data:', formData);
 
-    const data: ApiResponse = await response.json();
-    
-    if (data.success) {
-      setResponse(data);
-      setFormData({ name: '', email: '', message: '' });
-    } else {
-      setResponse(data);
-      if (data.errors) {
-        setErrors(data.errors);
+    try {
+      const response = await fetch(`${API_URL}/api/contacts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Response error:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
+
+      const data: ApiResponse = await response.json();
+      console.log('Response data:', data);
+      
+      if (data.success) {
+        setResponse(data);
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        setResponse(data);
+        if (data.errors) {
+          setErrors(data.errors);
+        }
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+      setResponse({
+        success: false,
+        message: error instanceof Error ? error.message : 'Network error. Please check your connection and try again.'
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-  } catch (error) {
-    setResponse({
-      success: false,
-      message: 'Network error. Please check your connection and try again.'
-    });
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
 
   return (
     <Box
@@ -133,6 +150,13 @@ const handleSubmit = async (e: React.FormEvent) => {
           </Heading>
           <Box w="80px" h="4px" bg="#D76C82" borderRadius="full" />
         </VStack>
+
+        {/* Debug info - remove this in production */}
+        <Box mb={4} p={4} bg="yellow.100" borderRadius="md" fontSize="sm">
+          <Text><strong>Debug Info:</strong></Text>
+          <Text>API URL: {API_URL}</Text>
+          <Text>Environment: {(import.meta as any).env.MODE}</Text>
+        </Box>
 
         {/* Response Alert */}
         {response && (

@@ -1,3 +1,4 @@
+// File: src/pages/ContactsAdmin.tsx
 import { useState, useEffect } from 'react';
 import {
   Box,
@@ -16,7 +17,6 @@ import {
   Card,
 } from '@chakra-ui/react';
 import { Search, Mail, Calendar, User } from 'lucide-react';
-import env from 'react-dotenv';
 
 interface Contact {
   id: number;
@@ -33,6 +33,8 @@ const ContactsAdminPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredContacts, setFilteredContacts] = useState<Contact[]>([]);
 
+  // Use Vite's environment variable directly
+const API_URL = (import.meta as any).env.VITE_API_URL || 'https://back-prm4.onrender.com';
   useEffect(() => {
     fetchContacts();
   }, []);
@@ -46,25 +48,39 @@ const ContactsAdminPage = () => {
     setFilteredContacts(filtered);
   }, [contacts, searchTerm]);
 
-  // File: src/pages/ContactsAdminPage.tsx
-const fetchContacts = async () => {
-  try {
-    setLoading(true);
-    const response = await fetch(`${env.VITE_API_URL}/api/contacts`);
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch contacts');
+  const fetchContacts = async () => {
+    try {
+      setLoading(true);
+      console.log('Fetching from:', `${API_URL}/api/contacts`);
+      
+      const response = await fetch(`${API_URL}/api/contacts`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
+      const data = await response.json();
+      console.log('Contacts data:', data);
+      setContacts(data);
+      setError(null);
+    } catch (err) {
+      console.error('Fetch error:', err);
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
     }
-    
-    const data = await response.json();
-    setContacts(data);
-    setError(null);
-  } catch (err) {
-    setError(err instanceof Error ? err.message : 'An error occurred');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
+
   const formatDate = (dateString: string) => {
     try {
       return new Date(dateString).toLocaleDateString('en-US', {
@@ -125,6 +141,14 @@ const fetchContacts = async () => {
           </Heading>
           <Box w="80px" h="4px" bg="#D76C82" borderRadius="full" />
         </VStack>
+
+        {/* Debug info - remove this in production */}
+        <Box mb={4} p={4} bg="yellow.100" borderRadius="md" fontSize="sm">
+          <Text><strong>Debug Info:</strong></Text>
+          <Text>API URL: {API_URL}</Text>
+          <Text>Environment: {(import.meta as any).env.MODE}</Text>
+          <Text>Contacts Count: {contacts.length}</Text>
+        </Box>
 
         {/* Search and Stats */}
         <VStack gap={{ base: 4, md: 6 }} mb={{ base: 6, md: 8 }}>
