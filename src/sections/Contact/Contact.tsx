@@ -1,5 +1,5 @@
 // File: src/sections/Contact/Contact.tsx
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Container,
@@ -36,11 +36,13 @@ const Contact = () => {
   const [response, setResponse] = useState<ApiResponse | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  // Hardcode API URL to avoid TypeScript issues
+  // Hardcode API URL to avoid any build issues
   const API_URL = 'https://back-prm4.onrender.com';
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    console.log(`Input changed: ${name} = ${value}`);
+    
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -61,49 +63,42 @@ const Contact = () => {
   };
 
   const validateForm = (): boolean => {
+    console.log('Validating form with data:', formData);
     const newErrors: { [key: string]: string } = {};
     
-    if (!formData.name.trim()) {
+    if (!formData.name || !formData.name.trim()) {
       newErrors.name = 'Name is required';
     }
     
-    if (!formData.email.trim()) {
+    if (!formData.email || !formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email';
     }
     
-    if (!formData.message.trim()) {
+    if (!formData.message || !formData.message.trim()) {
       newErrors.message = 'Message is required';
     }
     
+    console.log('Validation errors:', newErrors);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    console.log('=== FORM SUBMIT TRIGGERED ===');
-    console.log('Event:', e);
-    
-    e.preventDefault();
-    
-    console.log('Form data before validation:', formData);
-    
-    // Validate form before submitting
-    if (!validateForm()) {
-      console.log('Form validation failed:', errors);
-      return;
-    }
-
-    console.log('Form validation passed, proceeding with API call');
-    setIsSubmitting(true);
-    setResponse(null);
-    setErrors({});
-
-    console.log('Submitting to:', `${API_URL}/api/contacts`);
-    console.log('Form data:', formData);
+  // Separate function for API call to make debugging easier
+  const submitToApi = async () => {
+    console.log('=== STARTING API CALL ===');
+    console.log('API URL:', `${API_URL}/api/contacts`);
+    console.log('Payload:', JSON.stringify(formData, null, 2));
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        console.log('Request timeout reached, aborting...');
+        controller.abort();
+      }, 15000); // 15 second timeout
+
+      console.log('Making fetch request...');
       const response = await fetch(`${API_URL}/api/contacts`, {
         method: 'POST',
         headers: {
@@ -111,9 +106,11 @@ const Contact = () => {
           'Accept': 'application/json',
         },
         body: JSON.stringify(formData),
+        signal: controller.signal,
       });
 
-      console.log('Response status:', response.status);
+      clearTimeout(timeoutId);
+      console.log('Fetch completed. Response status:', response.status);
       console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
@@ -127,7 +124,6 @@ const Contact = () => {
       
       if (data.success) {
         setResponse(data);
-        // Reset form only on success
         setFormData({ name: '', email: '', message: '' });
       } else {
         setResponse(data);
@@ -136,21 +132,91 @@ const Contact = () => {
         }
       }
     } catch (error) {
-      console.error('Fetch error:', error);
+      console.error('=== API CALL ERROR ===');
+      console.error('Error details:', error);
+      
+      let errorMessage = 'Network error. Please check your connection and try again.';
+      
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          errorMessage = 'Request timed out. Please try again.';
+        } else if (error.message.includes('CORS')) {
+          errorMessage = 'Connection blocked. Please try again later.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       setResponse({
         success: false,
-        message: error instanceof Error ? error.message : 'Network error. Please check your connection and try again.'
+        message: errorMessage
       });
-    } finally {
-      setIsSubmitting(false);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    console.log('=== FORM SUBMIT TRIGGERED ===');
+    console.log('Event:', e);
+    console.log('Event type:', e.type);
+    
+    e.preventDefault();
+    e.stopPropagation();
+    
+    console.log('Form data before validation:', formData);
+    
+    // Validate form before submitting
+    if (!validateForm()) {
+      console.log('Form validation FAILED');
+      return;
+    }
+
+    console.log('Form validation PASSED, proceeding with API call');
+    setIsSubmitting(true);
+    setResponse(null);
+    setErrors({});
+
+    await submitToApi();
+    setIsSubmitting(false);
+  };
+
+  // Alternative submit handler for button click
+  const handleButtonClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    console.log('=== BUTTON CLICKED (as backup) ===');
+    console.log('Button event:', e);
+    
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (isSubmitting) {
+      console.log('Already submitting, ignoring click');
+      return;
+    }
+    
+    // Validate form
+    if (!validateForm()) {
+      console.log('Button validation FAILED');
+      return;
+    }
+
+    console.log('Button validation PASSED');
+    setIsSubmitting(true);
+    setResponse(null);
+    setErrors({});
+
+    await submitToApi();
+    setIsSubmitting(false);
   };
 
   // Test function for debugging
   const testApiConnection = async () => {
-    console.log('Test button clicked');
+    console.log('=== TESTING API CONNECTION ===');
     try {
-      const testResponse = await fetch(`${API_URL}/api/contacts/test`);
+      const testResponse = await fetch(`${API_URL}/api/contacts/test`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
       const testData = await testResponse.json();
       console.log('Test response:', testData);
       alert('Test successful! Check console for details.');
@@ -211,6 +277,8 @@ const Contact = () => {
           <Text>API URL: {API_URL}</Text>
           <Text>Form Data: {JSON.stringify(formData)}</Text>
           <Text>Is Submitting: {isSubmitting.toString()}</Text>
+          <Text>Errors: {JSON.stringify(errors)}</Text>
+          <Text>Component Loaded: ✓</Text>
         </Box>
 
         {/* Response Alert */}
@@ -306,47 +374,61 @@ const Contact = () => {
                 )}
               </Field.Root>
 
-              <Button
-                type="submit"
-                bg="#D76C82"
-                color="#EBE8DB"
-                borderRadius="full"
-                px={{ base: 4, md: 8 }}
-                py={{ base: 4, md: 6 }}
-                fontWeight="semibold"
-                _hover={{ bg: '#C95A78', transform: 'translateY(-2px)' }}
-                _disabled={{ 
-                  bg: '#D76C82', 
-                  opacity: 0.6, 
-                  cursor: 'not-allowed',
-                  transform: 'none'
-                }}
-                transition="all 0.3s"
-                boxShadow="lg"
-                w="full"
-                size={{ base: "md", md: "lg" }}
-                disabled={isSubmitting}
-                onClick={(e) => {
-                  console.log('=== BUTTON CLICKED ===');
-                  console.log('Button event:', e);
-                  console.log('Form data at button click:', formData);
-                  // Let the form's onSubmit handle the submission
-                }}
-              >
-                {isSubmitting ? 'Sending...' : 'Send Message'}
-              </Button>
-              
-              {/* Test button for debugging */}
-              <Button
-                onClick={testApiConnection}
-                bg="gray.500"
-                color="white"
-                size="sm"
-                w="full"
-                mt={2}
-              >
-                Test API Connection
-              </Button>
+              <VStack w="full" gap={2}>
+                <Button
+                  type="submit"
+                  bg="#D76C82"
+                  color="#EBE8DB"
+                  borderRadius="full"
+                  px={{ base: 4, md: 8 }}
+                  py={{ base: 4, md: 6 }}
+                  fontWeight="semibold"
+                  _hover={{ bg: '#C95A78', transform: 'translateY(-2px)' }}
+                  _disabled={{ 
+                    bg: '#D76C82', 
+                    opacity: 0.6, 
+                    cursor: 'not-allowed',
+                    transform: 'none'
+                  }}
+                  transition="all 0.3s"
+                  boxShadow="lg"
+                  w="full"
+                  size={{ base: "md", md: "lg" }}
+                  disabled={isSubmitting}
+                  onClick={handleButtonClick}
+                >
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
+                </Button>
+                
+                {/* Backup button that bypasses form submission */}
+                <Button
+                  bg="blue.500"
+                  color="white"
+                  size="sm"
+                  w="full"
+                  onClick={async () => {
+                    console.log('=== BACKUP BUTTON CLICKED ===');
+                    if (!validateForm()) return;
+                    setIsSubmitting(true);
+                    await submitToApi();
+                    setIsSubmitting(false);
+                  }}
+                  disabled={isSubmitting}
+                >
+                  Send (Backup Method)
+                </Button>
+                
+                {/* Test button for debugging */}
+                <Button
+                  onClick={testApiConnection}
+                  bg="gray.500"
+                  color="white"
+                  size="sm"
+                  w="full"
+                >
+                  Test API Connection
+                </Button>
+              </VStack>
             </VStack>
           </form>
         </Box>
