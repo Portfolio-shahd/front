@@ -197,7 +197,7 @@ const Projects = () => {
                       boxShadow: '0 12px 40px rgba(247, 165, 165, 0.3)',
                     }}
                     cursor="pointer"
-                    h={{ base: "380px", md: "450px" }}
+                    h={{ base: "350px", md: "430px" }}
                     display="flex"
                     flexDirection="column"
                   >
