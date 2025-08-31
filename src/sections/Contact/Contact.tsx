@@ -361,46 +361,6 @@ const Contact = () => {
                   </HStack>
                 ))}
               </VStack>
-
-              {/* Additional Info */}
-              <Box
-                bg="rgba(255, 255, 255, 0.3)"
-                backdropFilter="blur(10px)"
-                borderRadius="2xl"
-                p={6}
-                border="1px solid #cbabb1ff"
-                w="full"
-              >
-                <Heading 
-                  color="#3D0301" 
-                  fontWeight="semibold" 
-                  fontSize="xl" 
-                  mb={3}
-                >
-                  Why Work With Me?
-                </Heading>
-                <VStack align="start" gap={2}>
-                  {[
-                    'Feature-rich mobile applications',
-                    'User-friendly design focus',
-                    'Performance optimization',
-                    'Innovation-driven solutions'
-                  ].map((item, index) => (
-                    <HStack key={index} align="center" gap={2}>
-                      <Box 
-                        w={2} 
-                        h={2} 
-                        bg="#D76C82" 
-                        borderRadius="full" 
-                        flexShrink={0} 
-                      />
-                      <Text color="#3D0301" opacity={0.8}>
-                        {item}
-                      </Text>
-                    </HStack>
-                  ))}
-                </VStack>
-              </Box>
             </VStack>
           </GridItem>
 
