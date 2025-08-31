@@ -4,12 +4,17 @@ import {
   Container,
   Heading,
   VStack,
+  HStack,
   Input,
   Textarea,
   Button,
   Text,
   Field,
   Alert,
+  Grid,
+  GridItem,
+  Icon,
+  Link,
 } from '@chakra-ui/react';
 
 interface ContactForm {
@@ -35,7 +40,8 @@ const Contact = () => {
   const [response, setResponse] = useState<ApiResponse | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  const API_URL = 'https://back-prm4.onrender.com';
+  // Formspree endpoint URL
+  const FORMSPREE_URL = 'https://formspree.io/f/mdklzedg';
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -80,37 +86,63 @@ const Contact = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const submitToApi = async () => {
+  const submitToFormspree = async () => {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-      const response = await fetch(`${API_URL}/api/contacts`, {
+      const response = await fetch(FORMSPREE_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          // Optional: Add a subject line
+          _subject: `New contact form submission from ${formData.name}`,
+        }),
         signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
-      }
-
-      const data: ApiResponse = await response.json();
-      
-      if (data.success) {
-        setResponse(data);
+      if (response.ok) {
+        // Formspree returns different response structure
+        const data = await response.json();
+        
+        setResponse({
+          success: true,
+          message: 'Thank you for your message! We\'ll get back to you soon.'
+        });
+        
+        // Reset form on success
         setFormData({ name: '', email: '', message: '' });
       } else {
-        setResponse(data);
-        if (data.errors) {
-          setErrors(data.errors);
+        const errorData = await response.json();
+        
+        // Handle Formspree validation errors
+        if (errorData.errors) {
+          const formspreeErrors: { [key: string]: string } = {};
+          
+          errorData.errors.forEach((error: any) => {
+            if (error.field) {
+              formspreeErrors[error.field] = error.message;
+            }
+          });
+          
+          setErrors(formspreeErrors);
+          setResponse({
+            success: false,
+            message: 'Please fix the errors below and try again.'
+          });
+        } else {
+          setResponse({
+            success: false,
+            message: errorData.error || 'Failed to send message. Please try again.'
+          });
         }
       }
     } catch (error) {
@@ -122,7 +154,7 @@ const Contact = () => {
         } else if (error.message.includes('CORS')) {
           errorMessage = 'Connection blocked. Please try again later.';
         } else {
-          errorMessage = error.message;
+          errorMessage = 'Failed to send message. Please try again.';
         }
       }
       
@@ -144,9 +176,44 @@ const Contact = () => {
     setResponse(null);
     setErrors({});
 
-    await submitToApi();
+    await submitToFormspree();
     setIsSubmitting(false);
   };
+
+  // Contact info data
+  const contactInfo = [
+    {
+      icon: (
+        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.95a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      ),
+      title: "Email",
+      value: "shahdnajjar50@gmail.com",
+      href: "mailto:shahdnajjar50@gmail.com"
+    },
+    {
+      icon: (
+        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+        </svg>
+      ),
+      title: "Phone",
+      value: "+216 94 377 760",
+      href: "tel:+21694377760"
+    },
+    {
+      icon: (
+        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      ),
+      title: "Location",
+      value: "Tunisia",
+      href: null
+    }
+  ];
 
   return (
     <Box
@@ -195,7 +262,7 @@ const Contact = () => {
 
         {/* Response Alert */}
         {response && (
-          <Box mb={6} maxW={{ base: "100%", md: "600px" }} mx="auto">
+          <Box mb={6} maxW={{ base: "100%", md: "full" }} mx="auto">
             <Alert.Root status={response.success ? "success" : "error"}>
               <Alert.Indicator />
               <Alert.Title>
@@ -206,112 +273,246 @@ const Contact = () => {
           </Box>
         )}
 
-        <Box
-          bg="#EBE8DB"
-          borderRadius="3xl"
-          px={{ base: 4, md: 8 }}
-          py={{ base: 6, md: 10 }}
-          border="2px solid #cbabb1ff"
-          boxShadow="0 8px 32px rgba(61, 3, 1, 0.1)"
-          maxW={{ base: "100%", md: "600px" }}
+        {/* Two Column Layout */}
+        <Grid 
+          templateColumns={{ base: "1fr", lg: "1fr 1fr" }} 
+          gap={{ base: 8, lg: 12 }} 
+          maxW="6xl" 
           mx="auto"
-          transition="all 0.3s"
-          _hover={{ borderColor: '#c4a6aeff' }}
         >
-          <form onSubmit={handleSubmit}>
-            <VStack gap={{ base: 4, md: 6 }} align="start">
-              <Field.Root invalid={!!errors.name}>
-                <Field.Label color="#3D0301" fontWeight="medium">Name *</Field.Label>
-                <Input
-                  name="name"
-                  type="text"
-                  placeholder="Your Name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  bg="#FFF2EF"
-                  border="1px solid #d4b3baff"
-                  borderRadius="md"
+          
+          {/* Left Column - Contact Information */}
+          <GridItem>
+            <VStack align="start" gap={8}>
+              <Box>
+                <Heading
                   color="#3D0301"
-                  _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
-                  _placeholder={{ color: '#3D0301', opacity: 0.6 }}
-                  size={{ base: "md", md: "lg" }}
-                  required
-                />
-                {errors.name && (
-                  <Field.ErrorText color="#B03052">{errors.name}</Field.ErrorText>
-                )}
-              </Field.Root>
+                  fontSize={{ base: '2xl', md: '3xl' }}
+                  fontWeight="bold"
+                  mb={6}
+                >
+                  Let's <Text as="span" color="#B03052">Talk</Text> for Something Special
+                </Heading>
+                <Text 
+                  color="#3D0301" 
+                  fontSize="lg" 
+                  lineHeight="relaxed" 
+                  opacity={0.8}
+                >
+                  I specialize in building sleek, feature-rich mobile applications 
+                  that combine innovation, user-friendly design, and performance to exceed 
+                  expectations.
+                </Text>
+              </Box>
 
-              <Field.Root invalid={!!errors.email}>
-                <Field.Label color="#3D0301" fontWeight="medium">Email *</Field.Label>
-                <Input
-                  name="email"
-                  type="email"
-                  placeholder="Your Email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  bg="#FFF2EF"
-                  border="1px solid #d4b3baff"
-                  borderRadius="md"
-                  color="#3D0301"
-                  _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
-                  _placeholder={{ color: '#3D0301', opacity: 0.6 }}
-                  size={{ base: "md", md: "lg" }}
-                  required
-                />
-                {errors.email && (
-                  <Field.ErrorText color="#B03052">{errors.email}</Field.ErrorText>
-                )}
-              </Field.Root>
+              <VStack align="start" gap={6} w="full">
+                {contactInfo.map((item, index) => (
+                  <HStack 
+                    key={index} 
+                    align="start" 
+                    gap={4} 
+                    w="full"
+                    role="group"
+                    _hover={{ transform: 'translateX(4px)' }}
+                    transition="all 0.3s"
+                  >
+                    <Box
+                      w={12}
+                      h={12}
+                      bg="#D76C82"
+                      borderRadius="full"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      flexShrink={0}
+                      _groupHover={{ transform: 'scale(1.1)' }}
+                      transition="transform 0.3s"
+                    >
+                      <Box color="white" w={6} h={6}>
+                        {item.icon}
+                      </Box>
+                    </Box>
+                    <Box>
+                      <Text 
+                        color="#3D0301" 
+                        fontWeight="semibold" 
+                        fontSize="lg" 
+                        mb={1}
+                      >
+                        {item.title}
+                      </Text>
+                      {item.href ? (
+                        <Link
+                          href={item.href}
+                          color="#B03052" 
+                          _hover={{ color: '#D76C82' }} 
+                          transition="color 0.3s" 
+                          fontSize="lg"
+                          textDecoration="none"
+                        >
+                          {item.value}
+                        </Link>
+                      ) : (
+                        <Text color="#3D0301" opacity={0.8} fontSize="lg">
+                          {item.value}
+                        </Text>
+                      )}
+                    </Box>
+                  </HStack>
+                ))}
+              </VStack>
 
-              <Field.Root invalid={!!errors.message}>
-                <Field.Label color="#3D0301" fontWeight="medium">Message *</Field.Label>
-                <Textarea
-                  name="message"
-                  placeholder="Your Message"
-                  value={formData.message}
-                  onChange={handleInputChange}
-                  bg="#FFF2EF"
-                  border="1px solid #d4b3baff"
-                  borderRadius="md"
-                  color="#3D0301"
-                  rows={5}
-                  _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
-                  _placeholder={{ color: '#3D0301', opacity: 0.6 }}
-                  size={{ base: "md", md: "lg" }}
-                  required
-                />
-                {errors.message && (
-                  <Field.ErrorText color="#B03052">{errors.message}</Field.ErrorText>
-                )}
-              </Field.Root>
-
-              <Button
-                type="submit"
-                bg="#D76C82"
-                color="#EBE8DB"
-                borderRadius="full"
-                px={{ base: 4, md: 8 }}
-                py={{ base: 4, md: 6 }}
-                fontWeight="semibold"
-                _hover={{ bg: '#C95A78', transform: 'translateY(-2px)' }}
-                _disabled={{ 
-                  bg: '#D76C82', 
-                  opacity: 0.6, 
-                  cursor: 'not-allowed',
-                  transform: 'none'
-                }}
-                transition="all 0.3s"
-                boxShadow="lg"
+              {/* Additional Info */}
+              <Box
+                bg="rgba(255, 255, 255, 0.3)"
+                backdropFilter="blur(10px)"
+                borderRadius="2xl"
+                p={6}
+                border="1px solid #cbabb1ff"
                 w="full"
-                size={{ base: "md", md: "lg" }}
-                disabled={isSubmitting}
               >
-                {isSubmitting ? 'Sending...' : 'Send Message'}
-              </Button>
+                <Heading 
+                  color="#3D0301" 
+                  fontWeight="semibold" 
+                  fontSize="xl" 
+                  mb={3}
+                >
+                  Why Work With Me?
+                </Heading>
+                <VStack align="start" gap={2}>
+                  {[
+                    'Feature-rich mobile applications',
+                    'User-friendly design focus',
+                    'Performance optimization',
+                    'Innovation-driven solutions'
+                  ].map((item, index) => (
+                    <HStack key={index} align="center" gap={2}>
+                      <Box 
+                        w={2} 
+                        h={2} 
+                        bg="#D76C82" 
+                        borderRadius="full" 
+                        flexShrink={0} 
+                      />
+                      <Text color="#3D0301" opacity={0.8}>
+                        {item}
+                      </Text>
+                    </HStack>
+                  ))}
+                </VStack>
+              </Box>
             </VStack>
-          </form>
-        </Box>
+          </GridItem>
+
+          {/* Right Column - Contact Form */}
+          <GridItem>
+            <Box
+              bg="#EBE8DB"
+              borderRadius="3xl"
+              px={{ base: 4, md: 8 }}
+              py={{ base: 6, md: 10 }}
+              border="2px solid #cbabb1ff"
+              boxShadow="0 8px 32px rgba(61, 3, 1, 0.1)"
+              transition="all 0.3s"
+              _hover={{ borderColor: '#c4a6aeff' }}
+              h="fit-content"
+            >
+              <form onSubmit={handleSubmit}>
+                <VStack gap={{ base: 4, md: 6 }} align="start">
+                  <Field.Root invalid={!!errors.name}>
+                    <Field.Label color="#3D0301" fontWeight="medium">Name *</Field.Label>
+                    <Input
+                      name="name"
+                      type="text"
+                      placeholder="Your Name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      bg="#FFF2EF"
+                      border="1px solid #d4b3baff"
+                      borderRadius="md"
+                      color="#3D0301"
+                      _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
+                      _placeholder={{ color: '#3D0301', opacity: 0.6 }}
+                      size={{ base: "md", md: "lg" }}
+                      required
+                    />
+                    {errors.name && (
+                      <Field.ErrorText color="#B03052">{errors.name}</Field.ErrorText>
+                    )}
+                  </Field.Root>
+
+                  <Field.Root invalid={!!errors.email}>
+                    <Field.Label color="#3D0301" fontWeight="medium">Email *</Field.Label>
+                    <Input
+                      name="email"
+                      type="email"
+                      placeholder="Your Email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      bg="#FFF2EF"
+                      border="1px solid #d4b3baff"
+                      borderRadius="md"
+                      color="#3D0301"
+                      _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
+                      _placeholder={{ color: '#3D0301', opacity: 0.6 }}
+                      size={{ base: "md", md: "lg" }}
+                      required
+                    />
+                    {errors.email && (
+                      <Field.ErrorText color="#B03052">{errors.email}</Field.ErrorText>
+                    )}
+                  </Field.Root>
+
+                  <Field.Root invalid={!!errors.message}>
+                    <Field.Label color="#3D0301" fontWeight="medium">Message *</Field.Label>
+                    <Textarea
+                      name="message"
+                      placeholder="Your Message"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      bg="#FFF2EF"
+                      border="1px solid #d4b3baff"
+                      borderRadius="md"
+                      color="#3D0301"
+                      rows={5}
+                      _focus={{ borderColor: '#B03052', boxShadow: '0 0 0 1px #B03052' }}
+                      _placeholder={{ color: '#3D0301', opacity: 0.6 }}
+                      size={{ base: "md", md: "lg" }}
+                      required
+                    />
+                    {errors.message && (
+                      <Field.ErrorText color="#B03052">{errors.message}</Field.ErrorText>
+                    )}
+                  </Field.Root>
+
+                  <Button
+                    type="submit"
+                    bg="#D76C82"
+                    color="#EBE8DB"
+                    borderRadius="full"
+                    px={{ base: 4, md: 8 }}
+                    py={{ base: 4, md: 6 }}
+                    fontWeight="semibold"
+                    _hover={{ bg: '#C95A78', transform: 'translateY(-2px)' }}
+                    _disabled={{ 
+                      bg: '#D76C82', 
+                      opacity: 0.6, 
+                      cursor: 'not-allowed',
+                      transform: 'none'
+                    }}
+                    transition="all 0.3s"
+                    boxShadow="lg"
+                    w="full"
+                    size={{ base: "md", md: "lg" }}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Sending...' : 'Send Message'}
+                  </Button>
+                </VStack>
+              </form>
+            </Box>
+          </GridItem>
+        </Grid>
       </Container>
     </Box>
   );
