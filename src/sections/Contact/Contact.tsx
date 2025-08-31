@@ -201,17 +201,6 @@ const Contact = () => {
       title: "Phone",
       value: "+216 94 377 760",
       href: "tel:+21694377760"
-    },
-    {
-      icon: (
-        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-      ),
-      title: "Location",
-      value: "Tunisia",
-      href: null
     }
   ];
 
@@ -282,8 +271,8 @@ const Contact = () => {
         >
           
           {/* Left Column - Contact Information */}
-          <GridItem>
-            <VStack align="start" gap={8}>
+          <GridItem display="flex" alignItems="center">
+            <VStack align="start" gap={8} w="full" justify="center" h="full">
               <Box>
                 <Heading
                   color="#3D0301"
@@ -299,7 +288,7 @@ const Contact = () => {
                   lineHeight="relaxed" 
                   opacity={0.8}
                 >
-                  I specialize in building sleek, feature-rich mobile applications 
+                  I specialize in building sleek, feature-rich Web applications 
                   that combine innovation, user-friendly design, and performance to exceed 
                   expectations.
                 </Text>
