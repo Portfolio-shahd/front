@@ -271,8 +271,8 @@ const Contact = () => {
         >
           
           {/* Left Column - Contact Information */}
-          <GridItem display="flex" alignItems="center">
-            <VStack align="start" gap={8} w="full" justify="center" h="full">
+          <GridItem>
+            <VStack align="start" gap={8}>
               <Box>
                 <Heading
                   color="#3D0301"
